@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-08-31T13:44:29.038Z",
+  "updatedAt": "2026-08-31T15:15:20.825Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -56,11 +56,40 @@
       "rating": 4.5,
       "review": "",
       "startedAt": "",
-      "finishedAt": "2026-08-31",
+      "finishedAt": "2026-08-09",
       "favorite": false,
       "addedAt": "2026-08-31T11:27:42.010Z",
-      "updatedAt": "2026-08-31T11:27:54.636Z",
+      "updatedAt": "2026-08-31T15:12:40.799Z",
       "coverPath": "data/covers/5b219557-f6be-4d9c-b3a0-01d52022e1f3.jpg"
+    },
+    {
+      "id": "7a8416e4-cb8a-4d68-be9e-591dc5fffdb5",
+      "title": "Hábitos atómicos",
+      "authors": [
+        "James Clear"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Hábitos atómicos parte de una simple pero poderosa pregunta: ¿Cómo podemos vivir mejor? Sabemos que unos buenos hábitos nos permiten mejorar significativamente nuestra vida, pero con frecuencia nos desviamos del camino: dejamos de hacer ejercicio, comemos mal, dormimos poco, despilfarramos. ¿Por qué es tan fácil caer en los malos hábitos y tan complicado seguir los buenos? James Clear nos brinda fantásticas ideas basadas en investigaciones científicas, que le permiten revelarnos cómo podemos transformar pequeños hábitos cotidianos para cambiar nuestra vida y mejorarla. Esta guía pone al descubierto las fuerzas ocultas que moldean nuestro comportamiento —desde nuestra mentalidad, pasando por el ambiente y hasta la genética— y nos demuestra cómo aplicar cada cambio a nuestra vida y a nuestro trabajo. Después de leer este libro, tendrás un método sencillo para desarrollar un sistema eficaz que te conducirá al éxito. Aprende cómo… Darte tiempo para desarrollar nuevos hábitos. Superar la falta de motivación y de fuerza de voluntad. Diseñar un ambiente para que el éxito sea fácil de alcanzar. Regresar al buen camino cuando te hayas desviado un poco.",
+      "subjects": [
+        "Ensayo",
+        "Autoayuda"
+      ],
+      "isbn": "",
+      "year": 2017,
+      "fileName": "Habitos_atomicos_James_Clear.epub",
+      "fileSize": 1103697,
+      "status": "read",
+      "rating": 3.5,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "2026-08-05",
+      "favorite": false,
+      "addedAt": "2026-08-31T15:09:47.325Z",
+      "updatedAt": "2026-08-31T15:12:17.913Z",
+      "coverPath": "data/covers/7a8416e4-cb8a-4d68-be9e-591dc5fffdb5.jpg"
     },
     {
       "id": "ae0bd514-6d36-4c18-8a5e-8c3e907357da",
@@ -90,6 +119,96 @@
       "addedAt": "2026-08-31T11:24:57.958Z",
       "updatedAt": "2026-08-31T11:25:11.605Z",
       "coverPath": "data/covers/ae0bd514-6d36-4c18-8a5e-8c3e907357da.jpg"
+    },
+    {
+      "id": "de080f0d-b81e-45c5-b967-7cd1b27484e2",
+      "title": "De ratones y hombres",
+      "authors": [
+        "John Steinbeck"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "John Steinbeck, Premio Nobel 1962, plasmó en muchas de sus novelas el mundo de los desheredados que vagaban por la América rural de los años de la Depresión, en busca de cualquier trabajo que les permitiera sobrevivir.En esta novela, que ha sido llevada a la pantalla en 1992, Steinbeck narra la relación entre Lennie y George: Lennie, un débil mental tan primitivo como tierno; George, un pícaro hábil e ingenioso, que intenta proteger a Lennie de sí mismo, aunque a veces se escude en su fuerza para salir de apuros.La amistad entre estos dos seres marginados y su enfrentamiento al convencional y civilizado mundo de los poderosos es producto de un costado humano que sigue hoy tan vigente como cuando se escribió esta novela, hace más de sesenta años: la solidaridad.",
+      "subjects": [
+        "Novela",
+        "Drama",
+        "Realista"
+      ],
+      "isbn": "",
+      "year": 1936,
+      "fileName": "De_ratones_y_hombres_John_Steinbeck.epub",
+      "fileSize": 371788,
+      "status": "read",
+      "rating": 3.5,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "2026-08-18",
+      "favorite": false,
+      "addedAt": "2026-08-31T15:07:32.985Z",
+      "updatedAt": "2026-08-31T15:14:08.640Z",
+      "coverPath": "data/covers/de080f0d-b81e-45c5-b967-7cd1b27484e2.jpg"
+    },
+    {
+      "id": "e72928bd-00e7-4040-8592-0e51ae39419d",
+      "title": "Reina roja",
+      "authors": [
+        "Juan Gómez-Jurado"
+      ],
+      "series": "Antonia Scott & Jon Gutiérrez",
+      "seriesIndex": 1,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "NO HAS CONOCIDO A NADIE COMO ELLA Antonia Scott es especial. Muy especial. No es policía ni criminalista. Nunca ha empuñado un arma ni llevado una placa, y, sin embargo, ha resuelto decenas de crímenes. Pero hace un tiempo que Antonia no sale de su ático de Lavapiés. Las cosas que ha perdido le importan mucho más que las que esperan ahí fuera. Tampoco recibe visitas. Por eso no le gusta nada, nada, cuando escucha unos pasos desconocidos subiendo las escaleras hasta el último piso. Sea quien sea, Antonia está segura de que viene a buscarla. Y eso le gusta aún menos.",
+      "subjects": [
+        "Novela",
+        "Intriga",
+        "Policial"
+      ],
+      "isbn": "",
+      "year": 2018,
+      "fileName": "Reina_roja_Juan_GomezJurado.epub",
+      "fileSize": 948380,
+      "status": "read",
+      "rating": 4,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "2026-08-14",
+      "favorite": false,
+      "addedAt": "2026-08-31T15:08:27.984Z",
+      "updatedAt": "2026-08-31T15:14:18.549Z",
+      "coverPath": "data/covers/e72928bd-00e7-4040-8592-0e51ae39419d.jpg"
+    },
+    {
+      "id": "e79b82dc-d4c5-4e07-8c45-1f6396aafc21",
+      "title": "Loba Negra",
+      "authors": [
+        "Juan Gómez-Jurado"
+      ],
+      "series": "Antonia Scott & Jon Gutiérrez",
+      "seriesIndex": 2,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "SEGUIR VIVA. Antonia Scott no tiene miedo a nada. Solo a sí misma. NUNCA FUE. Pero hay alguien más peligroso que ella. Alguien que podría vencerla. TAN DIFÍCIL. La Loba Negra está cada vez más cerca. Y Antonia, por primera vez, está asustada.",
+      "subjects": [
+        "Novela",
+        "Intriga",
+        "Policial"
+      ],
+      "isbn": "",
+      "year": 2019,
+      "fileName": "Loba_Negra_Juan_GomezJurado.epub",
+      "fileSize": 892181,
+      "status": "read",
+      "rating": 3.5,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "2026-08-25",
+      "favorite": false,
+      "addedAt": "2026-08-31T15:09:00.218Z",
+      "updatedAt": "2026-08-31T15:13:23.218Z",
+      "coverPath": "data/covers/e79b82dc-d4c5-4e07-8c45-1f6396aafc21.jpg"
     }
   ]
 }
