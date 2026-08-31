@@ -34,23 +34,28 @@
   <div class="topbar-actions">
     <button type="button" class="sync-button" id="sync" hidden></button>
     <button type="button" class="profile-current" id="profile-current" title="Cambiar de perfil"></button>
-    <div class="menu">
-      <button type="button" class="btn btn-icon" id="menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Más opciones">⋯</button>
-      <div class="menu-panel" id="menu-panel" hidden>
-        <button type="button" data-action="switch">Cambiar de perfil</button>
-        <button type="button" data-action="profiles">Gestionar perfiles</button>
-        <hr>
-        <button type="button" data-action="sync-settings">Sincronización con GitHub</button>
-        <hr>
-        <button type="button" data-action="export">Exportar copia de seguridad</button>
-        <button type="button" data-action="import">Importar copia de seguridad</button>
-        <hr>
-        <button type="button" data-action="theme">Cambiar tema</button>
-        <button type="button" data-action="storage">Espacio usado</button>
-      </div>
-    </div>
+    <button type="button" class="btn btn-icon" id="menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Más opciones">⋯</button>
   </div>
 </header>
+
+<!-- Fuera de <header> a propósito: la topbar lleva backdrop-filter, y eso crea
+     un containing block que rompe el position:fixed de sus descendientes. -->
+<div class="menu-panel" id="menu-panel" hidden>
+  <div class="menu-head">
+    <h2>Opciones</h2>
+    <button type="button" class="btn btn-icon" id="menu-close" aria-label="Cerrar">✕</button>
+  </div>
+  <button type="button" data-action="switch">Cambiar de perfil</button>
+  <button type="button" data-action="profiles">Gestionar perfiles</button>
+  <hr>
+  <button type="button" data-action="sync-settings">Sincronización con GitHub</button>
+  <hr>
+  <button type="button" data-action="export">Exportar copia de seguridad</button>
+  <button type="button" data-action="import">Importar copia de seguridad</button>
+  <hr>
+  <button type="button" data-action="theme">Cambiar tema</button>
+  <button type="button" data-action="storage">Espacio usado</button>
+</div>
 
 <section class="stats" id="stats" aria-label="Resumen"></section>
 

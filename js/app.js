@@ -672,8 +672,10 @@ function wireEvents() {
 
   // --- menu
   el.menuToggle.addEventListener('click', () => toggleMenu());
+  $('#menu-close').addEventListener('click', () => toggleMenu(false));
   document.addEventListener('click', (event) => {
-    if (!event.target.closest('.menu')) toggleMenu(false);
+    // El panel ya no cuelga del botón, así que hay que excluir ambos.
+    if (!event.target.closest('#menu-panel, #menu-toggle')) toggleMenu(false);
   });
   el.menuPanel.addEventListener('click', (event) => {
     const action = event.target.closest('[data-action]')?.dataset.action;
@@ -701,11 +703,13 @@ function wireEvents() {
   el.backdrop.addEventListener('click', () => {
     toggleFab(false);
     toggleFilters(false);
+    toggleMenu(false);
   });
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     if (!el.fabActions.hidden) toggleFab(false);
+    else if (!el.menuPanel.hidden) toggleMenu(false);
     else if (el.filters.classList.contains('is-open')) toggleFilters(false);
   });
 
@@ -741,11 +745,32 @@ function clearFilters() {
 
 /* ------------------------------------------------- hojas y botón flotante */
 
+/**
+ * Menú, filtros y botón de añadir comparten el fondo oscuro y se estorban
+ * entre sí, así que el estado de las capas se recalcula en un único sitio en
+ * vez de encadenar condiciones en cada toggle.
+ */
+function syncOverlays() {
+  const menuOpen = !el.menuPanel.hidden;
+  const fabOpen = !el.fabActions.hidden;
+  const filtersOpen = el.filters.classList.contains('is-open');
+
+  // Menú y filtros solo son hojas a pantalla completa en móvil. En escritorio
+  // son paneles pequeños que no tapan nada, así que ni ocultan el botón de
+  // añadir ni deben congelar el scroll de la página.
+  const asSheet = window.matchMedia('(max-width: 760px)').matches;
+  const sheetOpen = asSheet && (menuOpen || filtersOpen);
+
+  el.backdrop.hidden = !(menuOpen || fabOpen || filtersOpen);
+  el.fab.hidden = sheetOpen;
+  document.body.style.overflow = sheetOpen ? 'hidden' : '';
+}
+
 function toggleFab(force) {
   const show = force ?? el.fabActions.hidden;
   el.fabActions.hidden = !show;
   el.fabMain.setAttribute('aria-expanded', String(show));
-  el.backdrop.hidden = !show && !el.filters.classList.contains('is-open');
+  syncOverlays();
   if (show) el.fabActions.querySelector('button').focus();
 }
 
@@ -753,12 +778,7 @@ function toggleFilters(force) {
   const show = force ?? !el.filters.classList.contains('is-open');
   el.filters.classList.toggle('is-open', show);
   el.filtersToggle.setAttribute('aria-expanded', String(show));
-  el.backdrop.hidden = !show && el.fabActions.hidden;
-  // El botón flotante taparía el pie de la hoja, y con los filtros abiertos
-  // añadir un libro tampoco es lo que se está intentando hacer.
-  el.fab.hidden = show;
-  // Se bloquea el scroll del fondo: si no, arrastrar dentro de la hoja mueve la lista.
-  document.body.style.overflow = show ? 'hidden' : '';
+  syncOverlays();
 }
 
 /** Cuántos filtros hay puestos, para avisarlo en el botón cuando está plegado. */
@@ -771,8 +791,18 @@ function renderFiltersCount() {
 
 function toggleMenu(force) {
   const show = force ?? el.menuPanel.hidden;
+
+  if (show) {
+    // El panel cuelga del <body>, así que se ancla al botón a mano. En móvil
+    // la hoja inferior ignora estas variables y se pega abajo.
+    const anchor = el.menuToggle.getBoundingClientRect();
+    el.menuPanel.style.setProperty('--menu-top', `${Math.round(anchor.bottom + 8)}px`);
+    el.menuPanel.style.setProperty('--menu-right', `${Math.round(window.innerWidth - anchor.right)}px`);
+  }
+
   el.menuPanel.hidden = !show;
   el.menuToggle.setAttribute('aria-expanded', String(show));
+  syncOverlays();
 }
 
 async function menuAction(action) {
