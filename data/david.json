@@ -1,0 +1,95 @@
+{
+  "format": "my-library",
+  "version": 1,
+  "profile": "David",
+  "updatedAt": "2026-08-31T12:07:04.232Z",
+  "books": [
+    {
+      "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
+      "title": "Misery",
+      "authors": [
+        "Stephen King"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Paul Sheldon es un escritor que sufre un grave accidente y recobra el conocimiento en una apartada casa en la que vive una misteriosa mujer, corpulenta y de extraño carácter. Se trata de una antigua enfermera, involucrada en varias muertes misteriosas ocurridas en diversos hospitales. Fanática de un personaje de una serie de libros que él ha decidido dejar de escribir, está dispuesto a hacer todo lo necesario para «convencerlo» de que retome la escritura. Esta mujer es capaz de los mayores horrores, y Paul, con las piernas rotas y entre terribles dolores, tendrá que luchar por su vida. Un relato obsesivo y aterrador, que sólo Stephen King podía ofrecernos.",
+      "subjects": [
+        "Novela",
+        "Terror"
+      ],
+      "isbn": "",
+      "year": 1986,
+      "fileName": "Misery_Stephen_King.epub",
+      "fileSize": 994956,
+      "status": "reading",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-08-31T11:32:33.652Z",
+      "updatedAt": "2026-08-31T11:32:44.639Z",
+      "coverPath": "data/covers/064f662e-7e97-4f3b-8020-8aba0c2f4b5e.jpg"
+    },
+    {
+      "id": "5b219557-f6be-4d9c-b3a0-01d52022e1f3",
+      "title": "El marciano",
+      "authors": [
+        "Andy Weir"
+      ],
+      "series": "Nova",
+      "seriesIndex": 247,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Seis días atrás el astronauta Mark Watney se convirtió en uno de los primeros hombres en caminar por la superficie de Marte. Ahora está seguro de que será el primer hombre en morir allí. La tripulación de la nave en que viajaba se ve obligada a evacuar el planeta a causa de una tormenta de polvo, dejando atrás a Mark tras darlo por muerto. Pero él está vivo, y atrapado a millones de kilómetros de cualquier ser humano, sin posibilidad de enviar señales a la Tierra. De todos modos, si lograra establecer conexión, moriría mucho antes de que el rescate llegara.Sin embargo, Mark no se da por vencido; armado con su ingenio, sus habilidades y sus conocimientos sobre botánica, se enfrentará a obstáculos aparentemente insuperables.Por suerte, el sentido del humor resultará ser su mayor fuente de fuerza. Obstinado en seguir con vida, incubará un plan absolutamente demencial para ponerse en contacto con la NASA.Con un final sorprendente, El marciano es una novela brillantemente construida, un delirio ingenioso, con una mecánica del suspense que sorprenderá al lector una y otra vez y le hará perderse en el cosmos de la naturaleza humana y la lucha por la supervivencia.Una experiencia literaria excepcional en gravedad cero.",
+      "subjects": [
+        "Ciencia ficción",
+        "Novela"
+      ],
+      "isbn": "",
+      "year": 2011,
+      "fileName": "El_marciano_Andy_Weir.epub",
+      "fileSize": 957657,
+      "status": "read",
+      "rating": 4.5,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "2026-08-31",
+      "favorite": false,
+      "addedAt": "2026-08-31T11:27:42.010Z",
+      "updatedAt": "2026-08-31T11:27:54.636Z",
+      "coverPath": "data/covers/5b219557-f6be-4d9c-b3a0-01d52022e1f3.jpg"
+    },
+    {
+      "id": "ae0bd514-6d36-4c18-8a5e-8c3e907357da",
+      "title": "El Imperio Final",
+      "authors": [
+        "Brandon Sanderson"
+      ],
+      "series": "Nacidos de la bruma",
+      "seriesIndex": 1,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Durante mil años, han caído las cenizas y nada florece. Durante mil años, los skaa han sido esclavizados y viven sumidos en un miedo inevitable. Durante mil años, el Lord Legislador reina con un poder absoluto gracias al terror y a su divina invencibilidad. Le ayudan los «obligadores» y los «inquisidores», junto a la poderosa magia de la «alomancia», que reside en los nobles.Algunos, sólo algunos, son capaces de «quemar» los metales que han tragado y que les otorgan poderes sobrenaturales. Diferentes metales, actuando en pares, otorgan poderes distintos. Pero los nobles, demasiado a menudo, han tenido trato sexual con jóvenes skaa y, aunque la ley lo prohíbe, algunos de sus bastardos han sobrevivido. Y algunos han heredado los poderes alománticos. Los «brumosos» (mistings) tienen sólo uno de esos poderes, pero los «nacidos de la bruma» (mistborns) son capaces de dominarlos todos.Ahora, Kelsier, el «superviviente», el único que ha logrado huir de los Pozos de Hathsin, ha encontrado a Vin, una pobre chica skaa con mucha suerte… Tal vez los dos unidos a la rebelión que los skaa intentan desde hace mil años puedan cambiar el mundo y la atroz dominación del Lord Legislador.",
+      "subjects": [
+        "Novela",
+        "Fantástico"
+      ],
+      "isbn": "",
+      "year": 2005,
+      "fileName": "El_Imperio_Final_Brandon_Sanderson.epub",
+      "fileSize": 2369574,
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "2026-08-31",
+      "favorite": false,
+      "addedAt": "2026-08-31T11:24:57.958Z",
+      "updatedAt": "2026-08-31T11:25:11.605Z",
+      "coverPath": "data/covers/ae0bd514-6d36-4c18-8a5e-8c3e907357da.jpg"
+    }
+  ]
+}
