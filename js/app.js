@@ -11,6 +11,9 @@ import {
   computeStats, exportBackup, importBackup,
 } from './library.js';
 import { zipSupported } from './zip.js';
+import * as sync from './sync.js';
+import * as gh from './github.js';
+import { REPO } from './config.js';
 
 const DEFAULT_PROFILES = ['David', 'Iria'];
 
@@ -23,11 +26,17 @@ const REMEMBER_KEY = 'my-library:profile';
 
 const state = {
   profiles: [...DEFAULT_PROFILES],
-  profile: DEFAULT_PROFILES[0],
+  profile: DEFAULT_PROFILES[0],   // quién eres
+  scope: null,                    // qué biblioteca miras: un perfil, o 'all'
   books: [],
   view: 'grid',
   filters: { search: '', status: '', minRating: 0, year: '', sort: 'added' },
+  syncState: 'off',               // off | synced | pending | working | error
+  dirty: false,                   // hay cambios locales sin publicar
 };
+
+/** ¿Estoy mirando mi propia estantería? Fuera de ella todo es de solo lectura. */
+const isOwnScope = () => state.scope === state.profile;
 
 /** Cache de object URLs de portadas: crear uno por render acabaria filtrando memoria. */
 const coverUrls = new Map();
@@ -38,6 +47,9 @@ const el = {
   gateProfiles: $('#gate-profiles'),
   gateCancel: $('#gate-cancel'),
   profileCurrent: $('#profile-current'),
+  scopes: $('#scopes'),
+  syncButton: $('#sync'),
+  syncDialog: $('#sync-dialog'),
   stats: $('#stats'),
   library: $('#library'),
   empty: $('#empty'),
@@ -92,6 +104,9 @@ async function init() {
   if (!zipSupported()) {
     toast('Tu navegador no puede descomprimir EPUB. Necesitas Chrome 103+, Firefox 113+ o Safari 16.4+.', { error: true, sticky: true });
   }
+
+  // En segundo plano: la web ya es usable mientras llega lo publicado.
+  initialSync();
 }
 
 function buildSelects() {
@@ -169,6 +184,7 @@ async function renderGate() {
 /** Entra como `name`: lo recuerda, lo persiste y carga su estantería. */
 async function enterAs(name) {
   state.profile = name;
+  state.scope = name;
   writeRemembered(name);
   await db.setSetting('activeProfile', name);
   closeGate();
@@ -200,7 +216,9 @@ function initialsOf(name) {
 /* ================================================================== datos */
 
 async function loadBooks() {
-  state.books = await db.listBooks(state.profile);
+  state.books = state.scope === 'all'
+    ? await db.listAllBooks()
+    : await db.listBooks(state.scope ?? state.profile);
   render();
 }
 
@@ -210,16 +228,213 @@ async function saveBook(book) {
   const index = state.books.findIndex((b) => b.id === book.id);
   if (index >= 0) state.books[index] = book;
   else state.books.push(book);
+  markDirty();
   render();
+}
+
+/** Marca que hay cambios propios pendientes de publicar. */
+function markDirty() {
+  if (!sync.canPublish()) return;
+  state.dirty = true;
+  setSyncState('pending');
+}
+
+/* ========================================================= sincronización */
+
+const SYNC_LABELS = {
+  off: 'Sin sincronizar',
+  synced: 'Al día',
+  pending: 'Sin publicar',
+  working: 'Publicando…',
+  error: 'Error al sincronizar',
+};
+
+function setSyncState(next) {
+  state.syncState = next;
+  el.syncButton.hidden = false;
+  el.syncButton.dataset.state = next;
+  el.syncButton.innerHTML = `<span class="dot"></span><span>${esc(SYNC_LABELS[next])}</span>`;
+  el.syncButton.title = next === 'off'
+    ? 'Configurar la sincronización con GitHub'
+    : 'Publicar tus cambios y traer los de los demás';
+}
+
+/** Al arrancar se trae lo publicado; sin token también, porque leer es libre. */
+async function initialSync() {
+  setSyncState(sync.canPublish() ? 'synced' : 'off');
+  try {
+    const result = await sync.pull();
+    if (result.profiles.length) await adoptProfiles(result.profiles);
+    if (result.added || result.updated || result.deleted) await loadBooks();
+  } catch (error) {
+    console.warn('No se pudo leer lo publicado', error);
+  }
+}
+
+/** Los perfiles publicados en el repo se añaden a los de este dispositivo. */
+async function adoptProfiles(published) {
+  const merged = Array.from(new Set([...state.profiles, ...published]));
+  if (merged.length === state.profiles.length) return;
+  state.profiles = merged;
+  await db.setSetting('profiles', merged);
+  renderScopes();
+}
+
+async function doSync() {
+  if (!sync.canPublish()) return openSyncSettings();
+
+  setSyncState('working');
+  try {
+    const pushed = await sync.push({ profiles: state.profiles });
+    const pulled = await sync.pull();
+    if (pulled.profiles.length) await adoptProfiles(pulled.profiles);
+
+    state.dirty = false;
+    setSyncState('synced');
+    await loadBooks();
+
+    const extras = [];
+    if (pushed.covers) extras.push(`${pushed.covers} portadas nuevas`);
+    if (pulled.added || pulled.updated) extras.push(`${pulled.added + pulled.updated} cambios recibidos`);
+    toast(`Publicados ${pushed.books} libros${extras.length ? ` · ${extras.join(' · ')}` : ''}.`);
+  } catch (error) {
+    setSyncState('error');
+    toast(error.message, { error: true });
+  }
+}
+
+/* ---------------------------------------------------- ajustes de sincronía */
+
+function openSyncSettings() {
+  const owner = sync.ownerProfile() || state.profile;
+
+  el.syncDialog.innerHTML = `
+    <form method="dialog">
+      <div class="dialog-body">
+        <h2>Sincronización con GitHub</h2>
+        <p class="detail-meta">
+          Tu biblioteca se publica en <strong>${esc(REPO.owner)}/${esc(REPO.repo)}</strong>,
+          un fichero por persona. <strong>Leer no necesita nada</strong>: quien abra la web
+          ve las bibliotecas publicadas. El token solo hace falta para publicar la tuya, se
+          guarda únicamente en este navegador y nunca se sube al repo.
+        </p>
+
+        <div class="field">
+          <label for="sync-owner">Este dispositivo publica el perfil de</label>
+          <select id="sync-owner" name="owner">
+            ${state.profiles.map((name) =>
+              `<option value="${esc(name)}" ${name === owner ? 'selected' : ''}>${esc(name)}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="sync-token">Token de acceso personal</label>
+          <input id="sync-token" name="token" type="password" autocomplete="off" spellcheck="false"
+                 placeholder="${gh.hasToken() ? '•••••••• (ya guardado, escribe para cambiarlo)' : 'github_pat_…'}">
+        </div>
+
+        <details class="sync-help">
+          <summary>Cómo sacar el token (1 minuto)</summary>
+          <ol>
+            <li>Entra en <strong>github.com → Settings → Developer settings →
+                Personal access tokens → Fine-grained tokens → Generate new token</strong>.</li>
+            <li>En <em>Repository access</em> elige <strong>Only select repositories</strong>
+                y marca <strong>${esc(REPO.owner)}/${esc(REPO.repo)}</strong>.</li>
+            <li>En <em>Permissions → Repository permissions</em>, pon
+                <strong>Contents: Read and write</strong>. No hace falta nada más.</li>
+            <li>Genera, copia y pega aquí. Solo se ve una vez.</li>
+          </ol>
+          <p>Al limitarlo a este repo, el token no puede tocar nada más de tu cuenta.</p>
+        </details>
+      </div>
+
+      <div class="dialog-footer">
+        ${gh.hasToken() ? '<button type="button" class="btn btn-danger" data-role="forget">Olvidar token</button>' : ''}
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-role="cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar y comprobar</button>
+      </div>
+    </form>`;
+
+  el.syncDialog.showModal();
+  const form = el.syncDialog.querySelector('form');
+
+  form.querySelector('[data-role="cancel"]').addEventListener('click', () => el.syncDialog.close());
+
+  form.querySelector('[data-role="forget"]')?.addEventListener('click', () => {
+    gh.setToken('');
+    sync.setOwnerProfile('');
+    setSyncState('off');
+    el.syncDialog.close();
+    toast('Token borrado de este navegador. Seguirás viendo lo publicado, pero no podrás publicar.');
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const submit = form.querySelector('[type="submit"]');
+    const typed = form.token.value.trim();
+
+    if (typed) gh.setToken(typed);
+    if (!gh.hasToken()) return toast('Hace falta un token para publicar.', { error: true });
+
+    submit.disabled = true;
+    submit.textContent = 'Comprobando…';
+    try {
+      // Se valida contra la API antes de dar por buena la configuración: mejor
+      // fallar aquí que a la primera publicación, con cambios ya hechos.
+      await gh.checkToken();
+      sync.setOwnerProfile(form.owner.value);
+      el.syncDialog.close();
+      setSyncState('pending');
+      state.dirty = true;
+      toast('Token verificado. Publicando tu biblioteca…');
+      await doSync();
+    } catch (error) {
+      toast(error.message, { error: true });
+      submit.disabled = false;
+      submit.textContent = 'Guardar y comprobar';
+    }
+  });
+
+  el.syncDialog.addEventListener('close', () => { el.syncDialog.innerHTML = ''; }, { once: true });
 }
 
 /* ================================================================ pintado */
 
 function render() {
   renderProfiles();
+  renderScopes();
   renderStats();
   renderYearFilter();
   renderLibrary();
+}
+
+/**
+ * Pestañas para saltar entre bibliotecas. Solo se muestran si de verdad hay
+ * más de una que mirar: con una sola persona sobran.
+ */
+async function renderScopes() {
+  const all = await db.listAllBooks();
+  const withBooks = state.profiles.filter((name) => all.some((book) => book.profile === name));
+  const others = withBooks.filter((name) => name !== state.profile);
+
+  el.scopes.hidden = others.length === 0;
+  if (el.scopes.hidden) {
+    if (state.scope === 'all' || !state.profiles.includes(state.scope)) state.scope = state.profile;
+    return;
+  }
+
+  const tabs = [
+    { key: state.profile, label: 'Mis libros', avatar: true },
+    ...others.map((name) => ({ key: name, label: name, avatar: true })),
+    { key: 'all', label: 'Todos', avatar: false },
+  ];
+
+  el.scopes.innerHTML = tabs.map(({ key, label, avatar }) => `
+    <button type="button" class="scope-tab${avatar ? '' : ' scope-all'}" data-scope="${esc(key)}"
+            aria-current="${key === state.scope}">
+      ${avatar ? avatarHtml(key) : ''}<span>${esc(label)}</span>
+    </button>`).join('');
 }
 
 function renderProfiles() {
@@ -283,7 +498,7 @@ function cardHtml(book) {
   return `
     <button type="button" class="card" data-id="${book.id}">
       <div class="card-cover" data-cover="${book.id}">
-        ${book.hasCover ? '' : fallbackCover(book)}
+        ${coverMarkup(book)}
         <div class="card-badges">
           <span class="badge">${esc(status.icon)} ${esc(status.label)}</span>
           ${book.favorite ? '<span class="badge badge-fav">★</span>' : ''}
@@ -300,6 +515,20 @@ function cardHtml(book) {
       </div>
     </button>
   `;
+}
+
+/**
+ * Qué va dentro del hueco de la portada.
+ *
+ * Si la portada está publicada en el repo es una URL normal y corriente: se
+ * pone el <img> directamente con loading="lazy" y que la difiera el navegador.
+ * Solo las que están en IndexedDB necesitan el observer, porque hay que leer
+ * el blob y montar un object URL.
+ */
+function coverMarkup(book) {
+  if (book.hasCover) return '';                       // la pinta paintCover()
+  if (book.coverPath) return `<img src="${esc(book.coverPath)}" alt="" loading="lazy">`;
+  return fallbackCover(book);
 }
 
 function fallbackCover(book) {
@@ -331,11 +560,18 @@ function observeCovers() {
   });
 }
 
+/** Puede haberla en local (blob) o publicada en el repo (los libros de otros). */
+function hasAnyCover(book) {
+  return Boolean(book?.hasCover || book?.coverPath);
+}
+
 async function paintCover(node) {
   const id = node.dataset.cover;
   try {
-    const url = await coverUrl(id);
-    if (!url || !node.isConnected) return;
+    const book = state.books.find((b) => b.id === id);
+    // El blob local es preferible: va sin red y sin esperar al CDN de Pages.
+    const url = (await coverUrl(id)) || book?.coverPath || null;
+    if (!url || !node.isConnected || node.querySelector('img')) return;
     const img = new Image();
     img.src = url;
     img.alt = '';
@@ -403,6 +639,16 @@ function wireEvents() {
     if (event.key === 'Escape' && !el.gateCancel.hidden) closeGate();
   });
 
+  // --- ámbito y sincronización
+  el.scopes.addEventListener('click', async (event) => {
+    const tab = event.target.closest('[data-scope]');
+    if (!tab || tab.dataset.scope === state.scope) return;
+    state.scope = tab.dataset.scope;
+    await loadBooks();
+  });
+
+  el.syncButton.addEventListener('click', () => doSync());
+
   // --- libros
   el.library.addEventListener('click', (event) => {
     const card = event.target.closest('.card');
@@ -469,6 +715,7 @@ async function menuAction(action) {
     case 'manual': openBook(emptyBook(state.profile), { isNew: true }); break;
     case 'switch': openGate(); break;
     case 'profiles': openProfiles(); break;
+    case 'sync-settings': openSyncSettings(); break;
     case 'export': await doExport(); break;
     case 'import': el.backupInput.click(); break;
     case 'theme': await toggleTheme(); break;
@@ -525,13 +772,20 @@ async function handleFiles(files) {
     return;
   }
 
+  // Los libros nuevos son siempre tuyos, aunque estés mirando otra estantería,
+  // y los duplicados se buscan solo contra la tuya.
+  const mine = await db.listBooks(state.profile);
+  state.scope = state.profile;
+
   const notice = progressToast(epubs.length);
-  const result = await importEpubs(epubs, state.profile, state.books, (done, total, name) => {
+  const result = await importEpubs(epubs, state.profile, mine, (done, total, name) => {
     notice.update(done, total, name);
   });
   notice.close();
 
   await loadBooks();
+
+  if (result.added.length) markDirty();
 
   const parts = [];
   if (result.added.length) parts.push(`${result.added.length} libro${result.added.length > 1 ? 's' : ''} añadido${result.added.length > 1 ? 's' : ''}`);
@@ -605,18 +859,31 @@ async function showStorage() {
 function openBook(book, { isNew = false } = {}) {
   if (!book) return;
   const draft = structuredClone(book);
+  const readOnly = !isNew && draft.profile !== state.profile;
 
-  el.bookDialog.innerHTML = bookDialogHtml(draft, isNew);
+  el.bookDialog.innerHTML = bookDialogHtml(draft, isNew, readOnly);
   el.bookDialog.showModal();
 
   const form = el.bookDialog.querySelector('form');
+  form.querySelector('[data-role="cancel"]').addEventListener('click', () => el.bookDialog.close());
+  el.bookDialog.addEventListener('close', () => { el.bookDialog.innerHTML = ''; }, { once: true });
   const coverBox = el.bookDialog.querySelector('.detail-cover');
   let coverBlob = null; // portada nueva elegida a mano, si la hay
 
-  if (draft.hasCover) {
+  if (hasAnyCover(draft)) {
     coverUrl(draft.id).then((url) => {
-      if (url) coverBox.insertAdjacentHTML('afterbegin', `<img src="${url}" alt="">`);
+      const src = url || draft.coverPath;
+      if (src) coverBox.insertAdjacentHTML('afterbegin', `<img src="${esc(src)}" alt="">`);
     });
+  }
+
+  // La biblioteca de otra persona se mira, no se toca: cualquier cambio aquí
+  // lo sobrescribiría su propietario en la siguiente sincronización.
+  if (readOnly) {
+    form.querySelectorAll('input, textarea, select').forEach((field) => { field.disabled = true; });
+    form.querySelectorAll('[data-role="pick-cover"], [data-role="favorite"]')
+      .forEach((button) => { button.disabled = true; });
+    return;
   }
 
   // --- estrellas
@@ -665,6 +932,7 @@ function openBook(book, { isNew = false } = {}) {
     releaseCover(draft.id);
     state.books = state.books.filter((b) => b.id !== draft.id);
     el.bookDialog.close();
+    markDirty();
     render();
     toast('Libro eliminado.');
   });
@@ -694,13 +962,10 @@ function openBook(book, { isNew = false } = {}) {
     el.bookDialog.close();
   });
 
-  form.querySelector('[data-role="cancel"]').addEventListener('click', () => el.bookDialog.close());
-
-  el.bookDialog.addEventListener('close', () => { el.bookDialog.innerHTML = ''; }, { once: true });
   form.querySelector('[name="title"]').focus();
 }
 
-function bookDialogHtml(book, isNew) {
+function bookDialogHtml(book, isNew, readOnly = false) {
   const meta = [
     ['Editorial', book.publisher],
     ['Publicado', book.year],
@@ -712,8 +977,13 @@ function bookDialogHtml(book, isNew) {
   return `
   <form method="dialog">
     <div class="dialog-body">
+      ${readOnly ? `<div class="readonly-note" style="grid-column:1/-1">
+        <span aria-hidden="true">👀</span>
+        <span>Estás viendo la biblioteca de <strong>${esc(book.profile)}</strong>. Su ficha es
+        de solo lectura: cualquier cambio lo sobrescribiría su dispositivo al sincronizar.</span>
+      </div>` : ''}
       <div class="detail-side">
-        <div class="detail-cover">${book.hasCover ? '' : fallbackCover(book)}</div>
+        <div class="detail-cover">${coverMarkup(book)}</div>
         <button type="button" class="btn btn-ghost" data-role="pick-cover">Cambiar portada</button>
         ${meta.length ? `<div class="detail-meta">${meta.map(([k, v]) => `<div><strong>${esc(k)}:</strong> ${esc(String(v))}</div>`).join('')}</div>` : ''}
         ${book.subjects?.length ? `<div class="chips">${book.subjects.slice(0, 6).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
@@ -790,10 +1060,10 @@ function bookDialogHtml(book, isNew) {
     </div>
 
     <div class="dialog-footer">
-      ${isNew ? '' : '<button type="button" class="btn btn-danger" data-role="delete">Eliminar</button>'}
+      ${isNew || readOnly ? '' : '<button type="button" class="btn btn-danger" data-role="delete">Eliminar</button>'}
       <span class="spacer"></span>
-      <button type="button" class="btn" data-role="cancel">Cancelar</button>
-      <button type="submit" class="btn btn-primary">Guardar</button>
+      <button type="button" class="btn" data-role="cancel">${readOnly ? 'Cerrar' : 'Cancelar'}</button>
+      ${readOnly ? '' : '<button type="submit" class="btn btn-primary">Guardar</button>'}
     </div>
   </form>`;
 }

@@ -158,6 +158,82 @@ button, input, select, textarea {
 .profile-current:hover { background: var(--bg-elev-2); border-color: var(--text-faint); }
 .profile-current .avatar { width: 28px; font-size: .8rem; }
 
+/* ------------------------------------------------------------ sincronización */
+
+.sync-button {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: .82rem;
+  white-space: nowrap;
+}
+.sync-button:hover { background: var(--bg-elev-2); color: var(--text); }
+.sync-button .dot {
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+.sync-button[data-state="pending"] { color: var(--accent-strong); border-color: var(--accent); }
+.sync-button[data-state="pending"] .dot { background: var(--accent); }
+.sync-button[data-state="synced"] .dot { background: #4caf7d; }
+.sync-button[data-state="error"] { color: var(--danger); border-color: var(--danger); }
+.sync-button[data-state="error"] .dot { background: var(--danger); }
+.sync-button[data-state="working"] .dot { animation: pulse 1s ease-in-out infinite; }
+
+@keyframes pulse { 50% { opacity: .25; } }
+
+/* ------------------------------------------------------ pestañas de ámbito */
+
+.scopes {
+  display: flex;
+  gap: .3rem;
+  padding: .8rem clamp(1rem, 4vw, 2.5rem) 0;
+  flex-wrap: wrap;
+}
+
+.scope-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .35rem .8rem .35rem .35rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-elev);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: .85rem;
+}
+.scope-tab:hover { color: var(--text); }
+.scope-tab[aria-current="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.scope-tab .avatar { width: 22px; font-size: .65rem; }
+.scope-tab.scope-all { padding-left: .8rem; }
+
+/* Aviso de solo lectura al mirar la biblioteca de otra persona */
+.readonly-note {
+  display: flex;
+  gap: .5rem;
+  padding: .6rem .8rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elev);
+  font-size: .85rem;
+  color: var(--text-dim);
+}
+
 /* ------------------------------------------------- selector de perfil (gate) */
 
 .gate {
@@ -708,7 +784,23 @@ button, input, select, textarea {
 
 /* ------------------------------------------------------------- perfiles */
 
-.dialog-profiles .dialog-body { grid-template-columns: 1fr; }
+.dialog-profiles .dialog-body,
+.dialog-sync .dialog-body { grid-template-columns: 1fr; gap: 1rem; }
+
+.dialog-sync h2 { font-family: var(--serif); font-weight: 500; }
+.dialog-sync .detail-meta { font-size: .85rem; line-height: 1.6; }
+
+.sync-help {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: .6rem .8rem;
+  background: var(--bg);
+  font-size: .85rem;
+  color: var(--text-dim);
+}
+.sync-help summary { cursor: pointer; color: var(--text); }
+.sync-help ol { margin: .8rem 0 .5rem; padding-left: 1.2rem; line-height: 1.7; }
+.sync-help p { margin: 0; color: var(--text-faint); }
 .profile-row {
   display: flex;
   align-items: center;

@@ -1,4 +1,8 @@
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+
+# Nunca subir libros ni copias de seguridad: el repo es público
 *.epub
 mi-biblioteca-*.json

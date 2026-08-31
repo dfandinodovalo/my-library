@@ -22,17 +22,42 @@ Un EPUB es un ZIP con un `.opf` dentro que describe el libro. La web:
 
 ## Dónde viven los datos
 
-En **IndexedDB, dentro de tu navegador**. No se sube nada a ningún sitio: el
-repo es público, pero tu biblioteca no.
+En dos sitios, y la distinción importa:
 
-La consecuencia importante: **los datos son por navegador y por dispositivo**.
-Lo que añadas en el portátil no aparece solo en el móvil. Para moverlos, usa
-`⋯ → Exportar copia de seguridad`, que baja un único `.json` con los libros y
-las portadas incrustadas, y restáuralo con `Importar copia de seguridad`.
-Restaurar es idempotente: reimportar el mismo fichero actualiza, no duplica.
+- **IndexedDB del navegador** es la copia de trabajo. Todo va rápido y funciona
+  sin conexión.
+- **El propio repo** es el almacén compartido, en `data/`: un JSON por persona
+  y las portadas en `data/covers/`.
 
-> Consejo: exporta de vez en cuando. Si vacías los datos del navegador o usas
-> modo incógnito, IndexedDB se va con ellos.
+### Sincronización
+
+Es asimétrica a propósito:
+
+| | Necesita token | Por qué |
+|---|---|---|
+| **Leer** las bibliotecas | No | Los ficheros se publican en el mismo sitio, así que basta un `fetch` relativo. Quien abra la web ve las bibliotecas al instante, sin configurar nada. |
+| **Publicar** la tuya | Sí | Escribe en el repo vía la API de GitHub. |
+
+Cada persona publica **solo su propio fichero**, así que no hay conflictos que
+resolver: nadie escribe donde escribe otro. Un lote de cambios se sube en un
+único commit (Git Data API: blobs → tree → commit → ref), no uno por fichero.
+
+Configúralo en `⋯ → Sincronización con GitHub`. El token es *fine-grained*,
+limitado a este repo, con `Contents: Read and write` y nada más. Se guarda solo
+en el `localStorage` de tu navegador: **nunca se sube al repo**.
+
+Al mirar la biblioteca de otra persona, sus fichas son de **solo lectura** — si
+las editaras, su dispositivo las sobrescribiría en la siguiente sincronización.
+
+> Los cambios del otro tardan hasta unos minutos en verse: GitHub Pages tiene
+> que redesplegar y su CDN cachea. Para un registro de libros leídos, irrelevante.
+
+### Copias de seguridad
+
+Aparte de la sincronización, `⋯ → Exportar copia de seguridad` baja un único
+`.json` con los libros y las portadas incrustadas en base64. Restaurar es
+idempotente: reimportar el mismo fichero actualiza, no duplica. Útil para migrar
+entre navegadores sin pasar por el repo.
 
 ### Perfiles
 
@@ -95,7 +120,11 @@ js/zip.js       Lector de ZIP sobre DecompressionStream
 js/epub.js      Metadatos y portada del EPUB
 js/db.js        IndexedDB (libros, portadas, preferencias)
 js/library.js   Modelo, importación, filtros, estadísticas, backup
+js/config.js    Dónde está el repo que hace de almacén
+js/github.js    Cliente de la API de GitHub (commits atómicos)
+js/sync.js      Publicar la propia biblioteca y traer las demás
 js/app.js       Interfaz
+data/           Lo publicado: un JSON por persona + portadas
 ```
 
 ## Compatibilidad

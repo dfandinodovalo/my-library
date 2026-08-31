@@ -32,6 +32,7 @@
   </div>
 
   <div class="topbar-actions">
+    <button type="button" class="sync-button" id="sync" hidden></button>
     <button type="button" class="profile-current" id="profile-current" title="Cambiar de perfil"></button>
     <button type="button" class="btn btn-primary" id="add-books">
       <span aria-hidden="true">＋</span> Añadir EPUB
@@ -43,6 +44,8 @@
         <hr>
         <button type="button" data-action="switch">Cambiar de perfil</button>
         <button type="button" data-action="profiles">Gestionar perfiles</button>
+        <hr>
+        <button type="button" data-action="sync-settings">Sincronización con GitHub</button>
         <hr>
         <button type="button" data-action="export">Exportar copia de seguridad</button>
         <button type="button" data-action="import">Importar copia de seguridad</button>
@@ -85,6 +88,9 @@
   </div>
 </section>
 
+<!-- Pestañas de ámbito: solo aparecen cuando hay más de una biblioteca que ver -->
+<nav class="scopes" id="scopes" aria-label="Qué biblioteca ver" hidden></nav>
+
 <main id="library" class="library view-grid" aria-live="polite"></main>
 
 <div class="empty" id="empty" hidden></div>
@@ -105,6 +111,7 @@
 
 <dialog id="book-dialog" class="dialog dialog-book"></dialog>
 <dialog id="profiles-dialog" class="dialog dialog-profiles"></dialog>
+<dialog id="sync-dialog" class="dialog dialog-sync"></dialog>
 
 <noscript>
   <p style="padding:2rem;text-align:center">Esta página necesita JavaScript para leer tus EPUB.</p>
