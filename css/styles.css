@@ -1,43 +1,72 @@
 /* =========================================================================
    Mi biblioteca — hoja de estilos unica
-   Paleta calida tipo papel/tinta; el tema oscuro es el de por defecto porque
-   las portadas destacan mucho mas sobre fondo oscuro.
+   Verde de libreria, sobrio. El tema oscuro es el de por defecto porque las
+   portadas destacan mucho mas sobre fondo oscuro.
    ========================================================================= */
 
+/* --- Color -----------------------------------------------------------------
+   Verde librería, sobrio y poco saturado. El acento no compite con las
+   portadas: son ellas las que deben llevar el color de la página.          */
+
 :root {
-  --bg: #16130f;
-  --bg-elev: #1f1b16;
-  --bg-elev-2: #2a241d;
-  --border: #3a3128;
-  --text: #f2ece3;
-  --text-dim: #a89c8c;
-  --text-faint: #7a6f61;
-  --accent: #d99a4e;
-  --accent-strong: #eab069;
-  --accent-ink: #2a1c0a;
-  --danger: #e26d5c;
-  --star: #f0b429;
+  --bg: #0d1714;
+  --bg-elev: #14211d;
+  --bg-elev-2: #1e2f29;
+  --border: #2a3d36;
+  --text: #e9eeeb;
+  --text-dim: #9db0a7;
+  --text-faint: #6d8078;
+  --accent: #4a9e7f;
+  --accent-strong: #67b998;
+  --accent-ink: #06110e;
+  --danger: #c9705f;
+  --star: #c9a961;          /* dorado apagado; el amarillo puro chirría aquí */
+
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 10px 30px rgb(0 0 0 / 45%);
   --cover-w: 168px;
   --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+
+  /* --- Espaciado ---------------------------------------------------------
+     Una escala única. Antes cada sección inventaba su padding (9.6, 11.2,
+     3.2, 14.4px...) y nada quedaba alineado ni con el mismo ritmo.        */
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* Margen lateral de TODA la página: una sola fuente de verdad */
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  /* Aire entre bloques de primer nivel (stats, filtros, rejilla...) */
+  --section-gap: var(--space-5);
+  /* Hueco bajo la rejilla para que el botón flotante no tape el último libro */
+  --fab-clearance: 6.5rem;
+  /* Altura común de los controles de una misma fila. Sin esto, un input y un
+     botón contiguos difieren en 2-3px según su font-size y no llegan a
+     alinearse por mucho que cuadre el padding. */
+  --control-h: 2.4rem;
 }
 
 :root[data-theme="light"] {
-  --bg: #f7f3ec;
-  --bg-elev: #fffdf9;
-  --bg-elev-2: #f0e9dd;
-  --border: #ded3c2;
-  --text: #241d15;
-  --text-dim: #6b5f4f;
-  --text-faint: #918471;
-  --accent: #a96a1f;
-  --accent-strong: #8d5613;
-  --accent-ink: #fffdf9;
-  --danger: #b4402c;
-  --shadow: 0 10px 28px rgb(80 60 30 / 14%);
+  --bg: #f4f2ec;
+  --bg-elev: #fbfaf6;
+  --bg-elev-2: #e9e8e0;
+  --border: #d7d5cb;
+  --text: #16241f;
+  --text-dim: #4e5f58;
+  --text-faint: #7c8a83;
+  --accent: #00594f;        /* el verde profundo de librería */
+  --accent-strong: #00423a;
+  --accent-ink: #fbfaf6;
+  --danger: #a34a38;
+  --star: #9c7c2c;
+  --shadow: 0 10px 28px rgb(20 50 40 / 12%);
 }
 
 * { box-sizing: border-box; }
@@ -55,8 +84,8 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   /* Textura muy sutil de papel para que el fondo no sea un plano muerto */
-  background-image: radial-gradient(circle at 15% 0%, rgb(217 154 78 / 7%), transparent 45%),
-                    radial-gradient(circle at 85% 10%, rgb(217 154 78 / 5%), transparent 40%);
+  background-image: radial-gradient(circle at 12% -5%, rgb(74 158 127 / 10%), transparent 42%),
+                    radial-gradient(circle at 88% 8%, rgb(74 158 127 / 6%), transparent 38%);
   background-attachment: fixed;
 }
 
@@ -72,8 +101,8 @@ button, input, select, textarea {
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: .45rem;
-  padding: .5rem .9rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--bg-elev);
@@ -93,7 +122,7 @@ button, input, select, textarea {
 }
 .btn-primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
 
-.btn-icon { padding: .5rem .7rem; line-height: 1; }
+.btn-icon { padding: var(--space-2) var(--space-3); line-height: 1; }
 
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
 .btn-ghost:hover { background: var(--bg-elev-2); color: var(--text); }
@@ -114,18 +143,18 @@ button, input, select, textarea {
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: .85rem clamp(1rem, 4vw, 2.5rem);
+  gap: var(--space-4);
+  padding: var(--space-3) var(--gutter);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
 
-.brand { display: flex; align-items: center; gap: .6rem; }
+.brand { display: flex; align-items: center; gap: var(--space-2); }
 .brand-mark { font-size: 1.4rem; }
 .brand h1 { font-family: var(--serif); font-size: 1.25rem; letter-spacing: .2px; }
 
-.topbar-actions { display: flex; align-items: center; gap: .5rem; margin-left: auto; }
+.topbar-actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
 
 /* Avatar generado a partir del nombre: sin ficheros de imagen que mantener */
 .avatar {
@@ -133,9 +162,12 @@ button, input, select, textarea {
   place-items: center;
   aspect-ratio: 1;
   border-radius: 22%;
+  /* Saturacion baja y tono oscuro: con los colores vivos de antes los
+     avatares eran lo mas llamativo de la pantalla, por delante de las
+     portadas, que es justo al reves de lo que interesa. */
   background: linear-gradient(150deg,
-    hsl(var(--h) 55% 46%), hsl(calc(var(--h) + 35) 60% 34%));
-  color: #fff;
+    hsl(var(--h) 26% 34%), hsl(calc(var(--h) + 25) 30% 24%));
+  color: #f2f5f3;
   font-weight: 700;
   letter-spacing: .02em;
   text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
@@ -146,8 +178,8 @@ button, input, select, textarea {
 .profile-current {
   display: flex;
   align-items: center;
-  gap: .5rem;
-  padding: .3rem .7rem .3rem .3rem;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg-elev);
@@ -163,8 +195,8 @@ button, input, select, textarea {
 .sync-button {
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
-  padding: .45rem .75rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg-elev);
@@ -182,7 +214,7 @@ button, input, select, textarea {
 }
 .sync-button[data-state="pending"] { color: var(--accent-strong); border-color: var(--accent); }
 .sync-button[data-state="pending"] .dot { background: var(--accent); }
-.sync-button[data-state="synced"] .dot { background: #4caf7d; }
+.sync-button[data-state="synced"] .dot { background: var(--accent); }
 .sync-button[data-state="error"] { color: var(--danger); border-color: var(--danger); }
 .sync-button[data-state="error"] .dot { background: var(--danger); }
 .sync-button[data-state="working"] .dot { animation: pulse 1s ease-in-out infinite; }
@@ -193,16 +225,16 @@ button, input, select, textarea {
 
 .scopes {
   display: flex;
-  gap: .3rem;
-  padding: .8rem clamp(1rem, 4vw, 2.5rem) 0;
+  gap: var(--space-1);
+  padding: var(--section-gap) var(--gutter) 0;
   flex-wrap: wrap;
 }
 
 .scope-tab {
   display: inline-flex;
   align-items: center;
-  gap: .45rem;
-  padding: .35rem .8rem .35rem .35rem;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg-elev);
@@ -218,14 +250,14 @@ button, input, select, textarea {
   font-weight: 600;
 }
 .scope-tab .avatar { width: 22px; font-size: .65rem; }
-.scope-tab.scope-all { padding-left: .8rem; }
+.scope-tab.scope-all { padding-left: var(--space-3); }
 
 /* Aviso de solo lectura al mirar la biblioteca de otra persona */
 .readonly-note {
   display: flex;
-  gap: .5rem;
-  padding: .6rem .8rem;
-  margin-bottom: 1rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-4);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-sm);
@@ -242,7 +274,7 @@ button, input, select, textarea {
   z-index: 300;
   display: grid;
   place-items: center;
-  padding: 2rem 1rem;
+  padding: var(--space-6) var(--space-4);
   background: var(--bg);
   animation: gate-in .25s ease;
 }
@@ -255,7 +287,7 @@ button, input, select, textarea {
   font-family: var(--serif);
   font-size: clamp(1.6rem, 5vw, 2.6rem);
   font-weight: 500;
-  margin-bottom: 2.2rem;
+  margin-bottom: var(--space-6);
   color: var(--text);
 }
 
@@ -263,15 +295,15 @@ button, input, select, textarea {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: clamp(1rem, 4vw, 2.4rem);
-  margin-bottom: 2.5rem;
+  gap: clamp(var(--space-4), 4vw, var(--space-6));
+  margin-bottom: var(--space-6);
 }
 
 .gate-profile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: .8rem;
+  gap: var(--space-3);
   padding: 0;
   border: 0;
   background: transparent;
@@ -295,7 +327,7 @@ button, input, select, textarea {
 .gate-profile-name { font-size: 1.05rem; }
 .gate-profile-count { font-size: .78rem; color: var(--text-faint); }
 
-.gate-actions { display: flex; justify-content: center; gap: .5rem; }
+.gate-actions { display: flex; justify-content: center; gap: var(--space-2); }
 
 /* --------------------------------------------------------------- menu (⋯) */
 
@@ -308,7 +340,7 @@ button, input, select, textarea {
   min-width: 230px;
   max-height: calc(100dvh - var(--menu-top, 4rem) - 1rem);
   overflow-y: auto;
-  padding: .35rem;
+  padding: var(--space-1);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -318,7 +350,7 @@ button, input, select, textarea {
   z-index: 95;
 }
 .menu-panel button {
-  padding: .55rem .7rem;
+  padding: var(--space-2) var(--space-3);
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -327,7 +359,7 @@ button, input, select, textarea {
   font-size: .9rem;
 }
 .menu-panel button:hover { background: var(--bg-elev-2); }
-.menu-panel hr { margin: .3rem .5rem; border: 0; border-top: 1px solid var(--border); }
+.menu-panel hr { margin: var(--space-1) var(--space-2); border: 0; border-top: 1px solid var(--border); }
 
 .menu-head { display: none; }
 
@@ -336,13 +368,13 @@ button, input, select, textarea {
 .stats {
   display: flex;
   flex-wrap: wrap;
-  gap: .6rem;
-  padding: 1.2rem clamp(1rem, 4vw, 2.5rem) 0;
+  gap: var(--space-2);
+  padding: var(--section-gap) var(--gutter) 0;
 }
 
 .stat {
   flex: 1 1 120px;
-  padding: .75rem .9rem;
+  padding: var(--space-3) var(--space-3);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -356,7 +388,7 @@ button, input, select, textarea {
 }
 .stat-label {
   display: block;
-  margin-top: .15rem;
+  margin-top: var(--space-1);
   font-size: .75rem;
   text-transform: uppercase;
   letter-spacing: .07em;
@@ -368,9 +400,9 @@ button, input, select, textarea {
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: .55rem;
+  gap: var(--space-2);
   align-items: center;
-  padding: .8rem clamp(1rem, 4vw, 2.5rem) .4rem;
+  padding: var(--section-gap) var(--gutter) 0;
 }
 
 .filters { display: contents; }   /* en escritorio los hijos van en la propia toolbar */
@@ -384,7 +416,7 @@ button, input, select, textarea {
 .search { position: relative; flex: 1 1 260px; }
 .search-icon {
   position: absolute;
-  left: .8rem;
+  left: var(--space-3);
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-faint);
@@ -393,7 +425,8 @@ button, input, select, textarea {
 }
 .search input {
   width: 100%;
-  padding: .55rem .8rem .55rem 2.2rem;
+  min-height: var(--control-h);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-6);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -401,7 +434,8 @@ button, input, select, textarea {
 .search input::-webkit-search-cancel-button { filter: grayscale(1); }
 
 .filters select {
-  padding: .55rem .7rem;
+  min-height: var(--control-h);
+  padding: var(--space-2) var(--space-3);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -410,14 +444,14 @@ button, input, select, textarea {
 
 .view-toggle {
   display: flex;
-  gap: .15rem;
-  padding: .2rem;
+  gap: var(--space-1);
+  padding: var(--space-1);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
 }
 .view-toggle button {
-  padding: .35rem .6rem;
+  padding: var(--space-1) var(--space-2);
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -429,19 +463,19 @@ button, input, select, textarea {
 /* --------------------------------------------------------------- rejilla */
 
 .library {
-  padding: 1.2rem clamp(1rem, 4vw, 2.5rem) 4rem;
+  padding: var(--section-gap) var(--gutter) var(--fab-clearance);
 }
 
 .view-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--cover-w), 1fr));
-  gap: 1.6rem 1.2rem;
+  gap: var(--space-6) var(--space-4);
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  gap: .55rem;
+  gap: var(--space-2);
   border: 0;
   padding: 0;
   background: transparent;
@@ -477,8 +511,8 @@ button, input, select, textarea {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: .4rem;
-  padding: 1rem .8rem;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
   background: linear-gradient(155deg, var(--bg-elev-2), var(--bg-elev));
   border: 1px solid var(--border);
 }
@@ -505,20 +539,22 @@ button, input, select, textarea {
   pointer-events: none;
 }
 .badge {
-  padding: .15rem .45rem;
+  padding: var(--space-1) var(--space-2);
   border-radius: 999px;
   font-size: .7rem;
   font-weight: 600;
-  background: rgb(0 0 0 / 62%);
+  /* Al 62% las portadas claras (naranjas, blancas) traspasaban y el texto
+     blanco se volvia ilegible. */
+  background: rgb(0 0 0 / 78%);
   color: #fff;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 .badge-fav { background: rgb(0 0 0 / 62%); color: var(--star); }
 
 .card-rating {
   position: absolute;
   inset: auto 0 0 0;
-  padding: 1.6rem .5rem .45rem;
+  padding: var(--space-5) var(--space-2) var(--space-2);
   background: linear-gradient(transparent, rgb(0 0 0 / 82%));
   color: var(--star);
   font-size: .85rem;
@@ -547,13 +583,13 @@ button, input, select, textarea {
 
 /* ------------------------------------------------------------------ lista */
 
-.view-list { display: flex; flex-direction: column; gap: .4rem; }
+.view-list { display: flex; flex-direction: column; gap: var(--space-1); }
 
 .view-list .card {
   flex-direction: row;
   align-items: center;
-  gap: .9rem;
-  padding: .5rem .7rem;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -574,7 +610,7 @@ button, input, select, textarea {
 .view-list .card-side {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
   font-size: .82rem;
   color: var(--text-dim);
 }
@@ -583,12 +619,12 @@ button, input, select, textarea {
 /* ------------------------------------------------------------------ vacio */
 
 .empty {
-  padding: 4rem 2rem;
+  padding: var(--space-8) var(--space-6);
   text-align: center;
   color: var(--text-dim);
 }
-.empty h2 { font-family: var(--serif); font-size: 1.3rem; margin-bottom: .5rem; color: var(--text); }
-.empty p { margin: 0 auto 1.2rem; max-width: 40ch; line-height: 1.6; }
+.empty h2 { font-family: var(--serif); font-size: 1.3rem; margin-bottom: var(--space-2); color: var(--text); }
+.empty p { margin: 0 auto var(--space-4); max-width: 40ch; line-height: 1.6; }
 
 /* -------------------------------------------------------------- dropzone */
 
@@ -602,14 +638,14 @@ button, input, select, textarea {
   backdrop-filter: blur(6px);
 }
 .dropzone-inner {
-  padding: 3rem 4rem;
+  padding: var(--space-7) var(--space-8);
   border: 2px dashed var(--accent);
   border-radius: 20px;
   text-align: center;
   font-size: 1.1rem;
   color: var(--accent-strong);
 }
-.dropzone-inner span { font-size: 3rem; display: block; margin-bottom: .5rem; }
+.dropzone-inner span { font-size: 3rem; display: block; margin-bottom: var(--space-2); }
 
 /* -------------------------------------------------------------- notices */
 
@@ -620,11 +656,11 @@ button, input, select, textarea {
   z-index: 200;
   display: flex;
   flex-direction: column;
-  gap: .5rem;
+  gap: var(--space-2);
   max-width: min(380px, calc(100vw - 2rem));
 }
 .toast {
-  padding: .7rem .9rem;
+  padding: var(--space-3) var(--space-3);
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
@@ -635,7 +671,7 @@ button, input, select, textarea {
   animation: slide-in .2s ease;
 }
 .toast.is-error { border-left-color: var(--danger); }
-.toast progress { width: 100%; margin-top: .4rem; height: 4px; }
+.toast progress { width: 100%; margin-top: var(--space-2); height: 4px; }
 
 @keyframes slide-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -661,8 +697,8 @@ button, input, select, textarea {
 .dialog-body {
   display: grid;
   grid-template-columns: 200px 1fr;
-  gap: 1.5rem;
-  padding: 1.5rem;
+  gap: var(--space-5);
+  padding: var(--space-5);
   overflow-y: auto;
   max-height: min(88vh, 900px);
 }
@@ -677,7 +713,7 @@ button, input, select, textarea {
 }
 .detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-.detail-side { display: flex; flex-direction: column; gap: .8rem; min-width: 0; }
+.detail-side { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
 .detail-meta {
   font-size: .78rem;
   color: var(--text-faint);
@@ -687,12 +723,12 @@ button, input, select, textarea {
 /* Los nombres de fichero de los EPUB son largos y sin espacios donde partir */
 .detail-meta div { overflow-wrap: anywhere; }
 
-.detail-main { min-width: 0; display: flex; flex-direction: column; gap: 1rem; }
+.detail-main { min-width: 0; display: flex; flex-direction: column; gap: var(--space-4); }
 
-.dialog-head { display: flex; align-items: flex-start; gap: .5rem; }
+.dialog-head { display: flex; align-items: flex-start; gap: var(--space-2); }
 .dialog-head .grow { flex: 1; min-width: 0; }
 
-.field { display: flex; flex-direction: column; gap: .3rem; }
+.field { display: flex; flex-direction: column; gap: var(--space-1); }
 .field > label {
   font-size: .74rem;
   text-transform: uppercase;
@@ -701,7 +737,7 @@ button, input, select, textarea {
 }
 .field input, .field textarea, .field select {
   width: 100%;
-  padding: .5rem .65rem;
+  padding: var(--space-2) var(--space-3);
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -710,20 +746,20 @@ button, input, select, textarea {
 .field-title input {
   font-family: var(--serif);
   font-size: 1.25rem;
-  padding: .35rem .5rem;
+  padding: var(--space-1) var(--space-2);
   background: transparent;
   border-color: transparent;
 }
 .field-title input:hover { border-color: var(--border); }
 .field-title input:focus { background: var(--bg); border-color: var(--border); }
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 
 /* --------------------------------------------------------------- estrellas */
 
 .stars {
   display: inline-flex;
-  gap: .1rem;
+  gap: var(--space-1);
   font-size: 1.7rem;
   line-height: 1;
   color: var(--text-faint);
@@ -762,12 +798,12 @@ button, input, select, textarea {
   opacity: .35;
 }
 
-.rating-row { display: flex; align-items: center; gap: .8rem; }
+.rating-row { display: flex; align-items: center; gap: var(--space-3); }
 .rating-value { font-size: .9rem; color: var(--text-dim); min-width: 4ch; }
 
-.chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 .chip {
-  padding: .2rem .6rem;
+  padding: var(--space-1) var(--space-2);
   font-size: .75rem;
   background: var(--bg-elev-2);
   border: 1px solid var(--border);
@@ -778,8 +814,8 @@ button, input, select, textarea {
 .dialog-footer {
   display: flex;
   align-items: center;
-  gap: .5rem;
-  padding: .9rem 1.5rem;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
   border-top: 1px solid var(--border);
   background: var(--bg);
   position: sticky;
@@ -793,13 +829,13 @@ button, input, select, textarea {
   color: var(--text-dim);
   max-height: 9rem;
   overflow-y: auto;
-  padding-right: .5rem;
+  padding-right: var(--space-2);
 }
 
 /* ------------------------------------------------------------- perfiles */
 
 .dialog-profiles .dialog-body,
-.dialog-sync .dialog-body { grid-template-columns: 1fr; gap: 1rem; }
+.dialog-sync .dialog-body { grid-template-columns: 1fr; gap: var(--space-4); }
 
 .dialog-sync h2 { font-family: var(--serif); font-weight: 500; }
 .dialog-sync .detail-meta { font-size: .85rem; line-height: 1.6; }
@@ -807,22 +843,22 @@ button, input, select, textarea {
 .sync-help {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: .6rem .8rem;
+  padding: var(--space-2) var(--space-3);
   background: var(--bg);
   font-size: .85rem;
   color: var(--text-dim);
 }
 .sync-help summary { cursor: pointer; color: var(--text); }
-.sync-help ol { margin: .8rem 0 .5rem; padding-left: 1.2rem; line-height: 1.7; }
+.sync-help ol { margin: var(--space-3) 0 var(--space-2); padding-left: var(--space-4); line-height: 1.7; }
 .sync-help p { margin: 0; color: var(--text-faint); }
 .profile-row {
   display: flex;
   align-items: center;
-  gap: .6rem;
-  padding: .6rem .2rem;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-1);
   border-bottom: 1px solid var(--border);
 }
-.profile-row input { flex: 1; padding: .45rem .6rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.profile-row input { flex: 1; padding: var(--space-2) var(--space-2); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 .profile-row .count { font-size: .8rem; color: var(--text-faint); white-space: nowrap; }
 
 /* ------------------------------------------------------- añadir libro (FAB) */
@@ -837,7 +873,7 @@ button, input, select, textarea {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: .6rem;
+  gap: var(--space-2);
 }
 
 .fab-main {
@@ -859,7 +895,7 @@ button, input, select, textarea {
 .fab-actions {
   display: flex;
   flex-direction: column;
-  gap: .5rem;
+  gap: var(--space-2);
   align-items: flex-end;
   animation: fab-in .16s ease;
 }
@@ -869,8 +905,8 @@ button, input, select, textarea {
 .fab-actions button {
   display: flex;
   align-items: center;
-  gap: .7rem;
-  padding: .7rem .9rem;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-elev);
@@ -900,18 +936,24 @@ button, input, select, textarea {
   :root {
     --cover-w: 105px;
     --radius: 14px;
+    /* Se reajustan los tokens y las secciones heredan: no hace falta volver a
+       escribir el padding de cada una, que es como se descoordinaron antes. */
+    --gutter: var(--space-4);
+    --section-gap: var(--space-3);
+    --fab-clearance: 6rem;
+    --control-h: 2.75rem;   /* 44px: mínimo cómodo para el dedo */
   }
 
   /* --- cabecera compacta: el título ocupa espacio que necesitan los libros */
-  .topbar { gap: .5rem; padding: .6rem .9rem; }
+  .topbar { gap: var(--space-2); padding: var(--space-2) var(--gutter); }
   .brand h1 { display: none; }
   .brand-mark { font-size: 1.5rem; }
-  .profile-current { padding: .25rem; border-color: transparent; background: transparent; }
+  .profile-current { padding: var(--space-1); border-color: transparent; background: transparent; }
   .profile-current .profile-current-name { display: none; }
   .profile-current .avatar { width: 34px; font-size: .9rem; }
   .sync-button span:not(.dot) { display: none; }
-  .sync-button { padding: .6rem; }
-  .btn-icon { padding: .6rem .7rem; font-size: 1.1rem; }
+  .sync-button { padding: var(--space-2); }
+  .btn-icon { padding: var(--space-2) var(--space-3); font-size: 1.1rem; }
 
   /* Menú como hoja inferior, igual que los filtros: sube desde abajo, ocupa
      todo el ancho y las opciones se pulsan sin apuntar. Las variables que
@@ -923,14 +965,14 @@ button, input, select, textarea {
     bottom: 0;
     min-width: 0;
     max-height: 80dvh;
-    padding: .5rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    padding: var(--space-2) var(--gutter) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
     border-radius: 18px 18px 0 0;
     border-left: 0;
     border-right: 0;
     border-bottom: 0;
     box-shadow: 0 -10px 30px rgb(0 0 0 / 35%);
   }
-  .menu-panel button { padding: .9rem .8rem; font-size: 1rem; min-height: 48px; }
+  .menu-panel button { padding: var(--space-3) var(--space-3); font-size: 1rem; min-height: 48px; }
 
   .menu-head {
     display: flex;
@@ -938,7 +980,7 @@ button, input, select, textarea {
     justify-content: space-between;
     position: sticky;
     top: 0;
-    padding: .4rem 0 .6rem;
+    padding: var(--space-2) 0 var(--space-2);
     background: var(--bg-elev);
   }
   .menu-head h2 { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; }
@@ -947,31 +989,39 @@ button, input, select, textarea {
   .stats {
     flex-wrap: nowrap;
     overflow-x: auto;
-    scroll-snap-type: x proximity;
-    gap: .45rem;
-    padding: .7rem .9rem 0;
+    /* Sin scroll-snap: alineaba el primer elemento con el inicio del
+       scrollport ignorando el padding, y desplazaba la tira 16px comiéndose
+       el margen izquierdo de la página. En métricas no aporta nada. */
+    gap: var(--space-2);
     scrollbar-width: none;
   }
   .stats::-webkit-scrollbar { display: none; }
+  /* El padding-right de un contenedor con scroll horizontal se ignora al llegar
+     al final, así que el margen se recupera con un separador de verdad. */
+  .stats::after,
+  .scopes::after {
+    content: '';
+    flex: 0 0 calc(var(--gutter) - var(--space-2));
+  }
   .stat {
     flex: 0 0 auto;
     min-width: 92px;
-    padding: .5rem .7rem;
-    scroll-snap-align: start;
+    padding: var(--space-2) var(--space-3);
   }
   .stat-value { font-size: 1.15rem; }
   .stat-label { font-size: .64rem; letter-spacing: .05em; }
 
   /* --- buscador + botón de filtros en una sola fila */
-  .toolbar { padding: .7rem .9rem .2rem; gap: .45rem; flex-wrap: nowrap; }
+  .toolbar { gap: var(--space-2); flex-wrap: nowrap; }
   .search { flex: 1 1 auto; min-width: 0; }
-  .search input { padding: .7rem .8rem .7rem 2.2rem; font-size: 1rem; }
+  .search input { padding: var(--space-2) var(--space-3) var(--space-2) var(--space-6); font-size: 1rem; }
 
   .filters-toggle {
     display: inline-flex;
     align-items: center;
-    gap: .35rem;
-    padding: .7rem .85rem;
+    min-height: var(--control-h);
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-3);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     background: var(--bg-elev);
@@ -990,7 +1040,7 @@ button, input, select, textarea {
     place-items: center;
     min-width: 1.25rem;
     height: 1.25rem;
-    padding: 0 .25rem;
+    padding: 0 var(--space-1);
     border-radius: 999px;
     background: var(--accent);
     color: var(--accent-ink);
@@ -1008,7 +1058,7 @@ button, input, select, textarea {
     z-index: 85;
     max-height: 85dvh;
     overflow-y: auto;
-    padding: .5rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    padding: var(--space-2) var(--gutter) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
     background: var(--bg-elev);
     border-top: 1px solid var(--border);
     border-radius: 18px 18px 0 0;
@@ -1032,7 +1082,7 @@ button, input, select, textarea {
     justify-content: space-between;
     position: sticky;
     top: 0;
-    padding: .5rem 0 .8rem;
+    padding: var(--space-2) 0 var(--space-3);
     background: var(--bg-elev);
   }
   .filters-head h2 { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; }
@@ -1040,8 +1090,8 @@ button, input, select, textarea {
   .filter-field {
     display: flex;
     flex-direction: column;
-    gap: .35rem;
-    margin-bottom: .9rem;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
   }
   .filter-field > span {
     display: block;
@@ -1050,39 +1100,37 @@ button, input, select, textarea {
     letter-spacing: .07em;
     color: var(--text-faint);
   }
-  .filters select { width: 100%; padding: .8rem .7rem; font-size: 1rem; }
+  .filters select { width: 100%; padding: var(--space-3) var(--space-3); font-size: 1rem; }
   .filters .view-toggle { width: 100%; }
-  .filters .view-toggle button { flex: 1; padding: .7rem; font-size: 1.1rem; }
+  .filters .view-toggle button { flex: 1; padding: var(--space-3); font-size: 1.1rem; }
 
   .filters-foot {
     display: flex;
-    gap: .5rem;
+    gap: var(--space-2);
     position: sticky;
     bottom: 0;
-    padding: .8rem 0 .2rem;
+    padding: var(--space-3) 0 var(--space-1);
     background: var(--bg-elev);
   }
-  .filters-foot .btn { flex: 1; justify-content: center; padding: .8rem; }
+  .filters-foot .btn { flex: 1; justify-content: center; padding: var(--space-3); }
 
   /* --- pestañas de ámbito deslizables */
   .scopes {
     flex-wrap: nowrap;
     overflow-x: auto;
-    padding: .7rem .9rem 0;
     scrollbar-width: none;
   }
   .scopes::-webkit-scrollbar { display: none; }
-  .scope-tab { flex: 0 0 auto; padding: .45rem .85rem .45rem .4rem; }
+  .scope-tab { flex: 0 0 auto; padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2); }
 
   /* --- rejilla: 3 columnas de portadas, que es lo que se viene a ver */
-  .library { padding: .9rem .9rem 6.5rem; }   /* hueco para no tapar con el FAB */
-  .view-grid { gap: 1.1rem .7rem; }
+  .view-grid { gap: var(--space-4) var(--space-2); }
 
   .card-title { font-size: .8rem; }
   .card-author { font-size: .72rem; }
-  .badge { font-size: .62rem; padding: .1rem .35rem; }
+  .badge { font-size: .62rem; padding: var(--space-1) var(--space-1); }
 
-  .view-list .card { padding: .6rem; }
+  .view-list .card { padding: var(--space-2); }
   .view-list .card-cover { width: 40px; flex-basis: 40px; }
 
   /* --- fichas a pantalla completa: los modales flotantes se manejan fatal */
@@ -1100,8 +1148,8 @@ button, input, select, textarea {
   .dialog-body {
     display: flex;
     flex-direction: column;
-    gap: 1.3rem;
-    padding: 1.1rem 1rem 1rem;
+    gap: var(--space-5);
+    padding: var(--space-4) var(--space-4) var(--space-4);
     max-height: none;
     height: calc(100dvh - 68px - env(safe-area-inset-bottom, 0px));
   }
@@ -1114,9 +1162,9 @@ button, input, select, textarea {
   .detail-side {
     display: grid;
     grid-template-columns: 92px minmax(0, 1fr);
-    gap: .7rem .9rem;
+    gap: var(--space-3) var(--space-3);
     align-items: start;
-    padding-top: 1rem;
+    padding-top: var(--space-4);
     border-top: 1px solid var(--border);
   }
   .detail-cover { width: 92px; grid-row: span 2; }
@@ -1124,22 +1172,22 @@ button, input, select, textarea {
   .detail-meta, .detail-side .chips { grid-column: 2; min-width: 0; }
   .description { max-height: none; }
   .field-row { grid-template-columns: 1fr; }
-  .field input, .field textarea, .field select { padding: .7rem .65rem; font-size: 1rem; }
+  .field input, .field textarea, .field select { padding: var(--space-3) var(--space-3); font-size: 1rem; }
   .field-title input { font-size: 1.15rem; }
   .stars { font-size: 2.1rem; }   /* medias estrellas pulsables con el dedo */
 
   .dialog-footer {
-    padding: .8rem 1rem calc(.8rem + env(safe-area-inset-bottom, 0px));
+    padding: var(--space-3) var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   }
-  .dialog-footer .btn { padding: .75rem 1rem; }
+  .dialog-footer .btn { padding: var(--space-3) var(--space-4); }
 
   /* --- avisos que no tapen el FAB */
   .toasts { left: .75rem; right: .75rem; bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); max-width: none; }
 
-  .gate { padding: 1.5rem 1rem; }
-  .gate-profiles { gap: 1.2rem; margin-bottom: 2rem; }
+  .gate { padding: var(--space-5) var(--space-4); }
+  .gate-profiles { gap: var(--space-4); margin-bottom: var(--space-6); }
 
-  .empty { padding: 3rem 1.2rem; }
+  .empty { padding: var(--space-7) var(--space-4); }
 }
 
 /* Móviles muy estrechos: tres columnas se quedan ilegibles, mejor dos */
