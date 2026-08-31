@@ -1,0 +1,976 @@
+/**
+ * Interfaz de Mi biblioteca.
+ *
+ * Vanilla JS sobre modulos ES: sin build, sin dependencias, sin CDN. Lo que
+ * hay en el repo es exactamente lo que sirve GitHub Pages.
+ */
+
+import * as db from './db.js';
+import {
+  STATUSES, SORTS, emptyBook, importEpubs, applyFilters, readYears,
+  computeStats, exportBackup, importBackup,
+} from './library.js';
+import { zipSupported } from './zip.js';
+
+const DEFAULT_PROFILES = ['David', 'Iria'];
+
+/**
+ * El perfil elegido se recuerda en localStorage y no en IndexedDB a proposito:
+ * es sincrono, asi que al recargar sabemos a quien mostrar sin esperar a que
+ * abra la base de datos y sin que parpadee el selector.
+ */
+const REMEMBER_KEY = 'my-library:profile';
+
+const state = {
+  profiles: [...DEFAULT_PROFILES],
+  profile: DEFAULT_PROFILES[0],
+  books: [],
+  view: 'grid',
+  filters: { search: '', status: '', minRating: 0, year: '', sort: 'added' },
+};
+
+/** Cache de object URLs de portadas: crear uno por render acabaria filtrando memoria. */
+const coverUrls = new Map();
+
+const $ = (selector) => document.querySelector(selector);
+const el = {
+  gate: $('#gate'),
+  gateProfiles: $('#gate-profiles'),
+  gateCancel: $('#gate-cancel'),
+  profileCurrent: $('#profile-current'),
+  stats: $('#stats'),
+  library: $('#library'),
+  empty: $('#empty'),
+  search: $('#search'),
+  status: $('#filter-status'),
+  rating: $('#filter-rating'),
+  year: $('#filter-year'),
+  sort: $('#sort'),
+  toasts: $('#toasts'),
+  epubInput: $('#epub-input'),
+  backupInput: $('#backup-input'),
+  dropzone: $('#dropzone'),
+  bookDialog: $('#book-dialog'),
+  profilesDialog: $('#profiles-dialog'),
+  menuPanel: $('#menu-panel'),
+  menuToggle: $('#menu-toggle'),
+};
+
+/* ==================================================================== init */
+
+init().catch((error) => {
+  console.error(error);
+  toast(`No se pudo arrancar la aplicación: ${error.message}`, { error: true });
+});
+
+async function init() {
+  const [profiles, view, theme, sort] = await Promise.all([
+    db.getSetting('profiles', DEFAULT_PROFILES),
+    db.getSetting('view', 'grid'),
+    db.getSetting('theme', 'dark'),
+    db.getSetting('sort', 'added'),
+  ]);
+
+  state.profiles = Array.isArray(profiles) && profiles.length ? profiles : [...DEFAULT_PROFILES];
+  state.profiles = await migrateLegacyProfile(state.profiles);
+  state.view = view;
+  state.filters.sort = sort;
+  applyTheme(theme);
+
+  buildSelects();
+  wireEvents();
+
+  // Si este dispositivo ya sabe quien lo usa, se entra directo; el selector
+  // solo aparece la primera vez o cuando se pide cambiar.
+  const remembered = readRemembered();
+  if (remembered && state.profiles.includes(remembered)) {
+    await enterAs(remembered);
+  } else {
+    openGate({ dismissible: false });
+  }
+
+  if (!zipSupported()) {
+    toast('Tu navegador no puede descomprimir EPUB. Necesitas Chrome 103+, Firefox 113+ o Safari 16.4+.', { error: true, sticky: true });
+  }
+}
+
+function buildSelects() {
+  for (const [key, { label }] of Object.entries(STATUSES)) {
+    el.status.append(new Option(label, key));
+  }
+  for (const [key, { label }] of Object.entries(SORTS)) {
+    el.sort.append(new Option(label, key));
+  }
+  el.sort.value = state.filters.sort;
+
+  document.querySelectorAll('.view-toggle button')
+    .forEach((button) => button.classList.toggle('is-active', button.dataset.view === state.view));
+}
+
+/* ====================================================== selector de perfil */
+
+/**
+ * Antes de que existiera este selector el segundo perfil se llamaba
+ * "Mi pareja". Se renombra al vuelo, arrastrando sus libros, para que los
+ * dispositivos que ya tengan datos no se queden con el nombre viejo.
+ */
+async function migrateLegacyProfile(profiles) {
+  const LEGACY = 'Mi pareja';
+  const NEW = 'Iria';
+  if (!profiles.includes(LEGACY) || profiles.includes(NEW)) return profiles;
+
+  const books = await db.listBooks(LEGACY);
+  if (books.length) await db.putBooks(books.map((book) => ({ ...book, profile: NEW })));
+
+  const renamed = profiles.map((name) => (name === LEGACY ? NEW : name));
+  await db.setSetting('profiles', renamed);
+  if (readRemembered() === LEGACY) writeRemembered(NEW);
+  return renamed;
+}
+
+/** localStorage puede lanzar en modo privado de Safari, de ahi los try/catch. */
+function readRemembered() {
+  try { return localStorage.getItem(REMEMBER_KEY); } catch { return null; }
+}
+
+function writeRemembered(name) {
+  try { localStorage.setItem(REMEMBER_KEY, name); } catch { /* sin memoria, se pregunta cada vez */ }
+}
+
+function openGate({ dismissible = true } = {}) {
+  el.gate.hidden = false;
+  el.gateCancel.hidden = !dismissible;
+  renderGate();
+  el.gate.querySelector('.gate-profile')?.focus();
+}
+
+function closeGate() {
+  el.gate.hidden = true;
+}
+
+async function renderGate() {
+  // El recuento por perfil es lo que hace util el selector: de un vistazo
+  // sabes cual es cual sin tener que entrar.
+  const all = await db.listAllBooks();
+  const counts = new Map();
+  all.forEach((book) => counts.set(book.profile, (counts.get(book.profile) || 0) + 1));
+
+  el.gateProfiles.innerHTML = state.profiles.map((name) => {
+    const count = counts.get(name) || 0;
+    return `
+      <button type="button" class="gate-profile" data-profile="${esc(name)}">
+        ${avatarHtml(name)}
+        <span class="gate-profile-name">${esc(name)}</span>
+        <span class="gate-profile-count">${count === 1 ? '1 libro' : `${count} libros`}</span>
+      </button>`;
+  }).join('');
+}
+
+/** Entra como `name`: lo recuerda, lo persiste y carga su estantería. */
+async function enterAs(name) {
+  state.profile = name;
+  writeRemembered(name);
+  await db.setSetting('activeProfile', name);
+  closeGate();
+  await loadBooks();
+}
+
+/* --------------------------------------------------------------- avatares */
+
+/**
+ * Avatares generados a partir del nombre: nada de ficheros de imagen que
+ * subir al repo, y un perfil nuevo tiene su color desde el primer segundo.
+ */
+function avatarHtml(name) {
+  return `<span class="avatar" style="--h:${hueOf(name)}" aria-hidden="true">${esc(initialsOf(name))}</span>`;
+}
+
+function hueOf(name) {
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + char.codePointAt(0)) % 360;
+  return hash;
+}
+
+function initialsOf(name) {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '?';
+  return (words[0][0] + (words.length > 1 ? words[words.length - 1][0] : '')).toUpperCase();
+}
+
+/* ================================================================== datos */
+
+async function loadBooks() {
+  state.books = await db.listBooks(state.profile);
+  render();
+}
+
+async function saveBook(book) {
+  book.updatedAt = new Date().toISOString();
+  await db.putBook(book);
+  const index = state.books.findIndex((b) => b.id === book.id);
+  if (index >= 0) state.books[index] = book;
+  else state.books.push(book);
+  render();
+}
+
+/* ================================================================ pintado */
+
+function render() {
+  renderProfiles();
+  renderStats();
+  renderYearFilter();
+  renderLibrary();
+}
+
+function renderProfiles() {
+  el.profileCurrent.innerHTML = `
+    ${avatarHtml(state.profile)}
+    <span class="profile-current-name">${esc(state.profile)}</span>`;
+  el.profileCurrent.setAttribute('aria-label', `Perfil de ${state.profile}. Cambiar de perfil`);
+}
+
+function renderStats() {
+  const stats = computeStats(state.books);
+  const cards = [
+    ['En la estantería', stats.total],
+    ['Leídos', stats.read],
+    [`Leídos en ${new Date().getFullYear()}`, stats.thisYear],
+    ['Leyendo ahora', stats.reading],
+    ['Nota media', stats.average ? stats.average.toFixed(1) : '—'],
+  ];
+  el.stats.innerHTML = cards.map(([label, value]) => `
+    <div class="stat">
+      <span class="stat-value">${esc(String(value))}</span>
+      <span class="stat-label">${esc(label)}</span>
+    </div>
+  `).join('');
+}
+
+function renderYearFilter() {
+  const current = el.year.value;
+  const years = readYears(state.books);
+  el.year.innerHTML = '<option value="">Cualquier año</option>'
+    + years.map((year) => `<option value="${year}">Leído en ${year}</option>`).join('');
+  if (years.map(String).includes(current)) el.year.value = current;
+  else state.filters.year = '';
+}
+
+function renderLibrary() {
+  const books = applyFilters(state.books, state.filters);
+
+  el.library.className = `library view-${state.view}`;
+  el.library.innerHTML = books.map(cardHtml).join('');
+  observeCovers();
+
+  const hasFilters = Boolean(state.filters.search || state.filters.status
+    || state.filters.minRating || state.filters.year);
+
+  el.empty.hidden = books.length > 0;
+  if (books.length === 0) {
+    el.empty.innerHTML = hasFilters
+      ? `<h2>Nada por aquí</h2><p>Ningún libro de <strong>${esc(state.profile)}</strong> encaja con estos filtros.</p>
+         <button type="button" class="btn" data-action="clear-filters">Quitar filtros</button>`
+      : `<h2>La estantería de ${esc(state.profile)} está vacía</h2>
+         <p>Arrastra tus ficheros <strong>.epub</strong> a esta ventana y sacaré el título, el autor y la portada de cada uno.</p>
+         <button type="button" class="btn btn-primary" data-action="add">Elegir EPUB</button>`;
+  }
+}
+
+function cardHtml(book) {
+  const author = book.authors[0] || 'Autor desconocido';
+  const status = STATUSES[book.status];
+
+  return `
+    <button type="button" class="card" data-id="${book.id}">
+      <div class="card-cover" data-cover="${book.id}">
+        ${book.hasCover ? '' : fallbackCover(book)}
+        <div class="card-badges">
+          <span class="badge">${esc(status.icon)} ${esc(status.label)}</span>
+          ${book.favorite ? '<span class="badge badge-fav">★</span>' : ''}
+        </div>
+        ${book.rating ? `<div class="card-rating">${stars(book.rating)}</div>` : ''}
+      </div>
+      <div class="card-main">
+        <div class="card-title">${esc(book.title)}</div>
+        <div class="card-author">${esc(author)}</div>
+      </div>
+      <div class="card-side">
+        <span class="list-stars">${book.rating ? stars(book.rating) : ''}</span>
+        <span>${book.finishedAt ? esc(book.finishedAt) : ''}</span>
+      </div>
+    </button>
+  `;
+}
+
+function fallbackCover(book) {
+  return `<div class="cover-fallback">
+    <div class="cf-title">${esc(book.title)}</div>
+    <div class="cf-author">${esc(book.authors[0] || '')}</div>
+  </div>`;
+}
+
+/**
+ * Las portadas se cargan solo cuando se acercan al viewport. Con 300 libros,
+ * leer los 300 blobs de IndexedDB al pintar bloquearia la pagina un segundo largo.
+ */
+let coverObserver = null;
+
+function observeCovers() {
+  coverObserver?.disconnect();
+  coverObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      coverObserver.unobserve(entry.target);
+      void paintCover(entry.target);
+    }
+  }, { rootMargin: '400px' });
+
+  el.library.querySelectorAll('[data-cover]').forEach((node) => {
+    const book = state.books.find((b) => b.id === node.dataset.cover);
+    if (book?.hasCover) coverObserver.observe(node);
+  });
+}
+
+async function paintCover(node) {
+  const id = node.dataset.cover;
+  try {
+    const url = await coverUrl(id);
+    if (!url || !node.isConnected) return;
+    const img = new Image();
+    img.src = url;
+    img.alt = '';
+    img.loading = 'lazy';
+    node.prepend(img);
+  } catch (error) {
+    console.warn('No se pudo cargar la portada', id, error);
+  }
+}
+
+async function coverUrl(id) {
+  if (coverUrls.has(id)) return coverUrls.get(id);
+  const blob = await db.getCover(id);
+  if (!blob) return null;
+  const url = URL.createObjectURL(blob);
+  coverUrls.set(id, url);
+  return url;
+}
+
+function stars(rating) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5;
+  return '★'.repeat(full) + (half ? '½' : '');
+}
+
+/* ================================================================ eventos */
+
+function wireEvents() {
+  // --- filtros
+  el.search.addEventListener('input', debounce(() => {
+    state.filters.search = el.search.value;
+    renderLibrary();
+  }, 150));
+
+  el.status.addEventListener('change', () => { state.filters.status = el.status.value; renderLibrary(); });
+  el.rating.addEventListener('change', () => { state.filters.minRating = Number(el.rating.value); renderLibrary(); });
+  el.year.addEventListener('change', () => { state.filters.year = el.year.value; renderLibrary(); });
+  el.sort.addEventListener('change', () => {
+    state.filters.sort = el.sort.value;
+    db.setSetting('sort', el.sort.value);
+    renderLibrary();
+  });
+
+  document.querySelector('.view-toggle').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-view]');
+    if (!button) return;
+    state.view = button.dataset.view;
+    db.setSetting('view', state.view);
+    document.querySelectorAll('.view-toggle button')
+      .forEach((b) => b.classList.toggle('is-active', b === button));
+    renderLibrary();
+  });
+
+  // --- perfiles
+  el.profileCurrent.addEventListener('click', () => openGate());
+  el.gateCancel.addEventListener('click', () => closeGate());
+
+  el.gate.addEventListener('click', async (event) => {
+    if (event.target.closest('[data-action="profiles"]')) return openProfiles();
+    const tile = event.target.closest('[data-profile]');
+    if (tile) await enterAs(tile.dataset.profile);
+  });
+
+  el.gate.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !el.gateCancel.hidden) closeGate();
+  });
+
+  // --- libros
+  el.library.addEventListener('click', (event) => {
+    const card = event.target.closest('.card');
+    if (card) openBook(state.books.find((b) => b.id === card.dataset.id));
+  });
+
+  el.empty.addEventListener('click', (event) => {
+    const action = event.target.closest('[data-action]')?.dataset.action;
+    if (action === 'add') el.epubInput.click();
+    if (action === 'clear-filters') clearFilters();
+  });
+
+  // --- menu
+  el.menuToggle.addEventListener('click', () => toggleMenu());
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.menu')) toggleMenu(false);
+  });
+  el.menuPanel.addEventListener('click', (event) => {
+    const action = event.target.closest('[data-action]')?.dataset.action;
+    if (!action) return;
+    toggleMenu(false);
+    menuAction(action);
+  });
+
+  // --- entradas de fichero
+  $('#add-books').addEventListener('click', () => el.epubInput.click());
+  el.epubInput.addEventListener('change', () => {
+    handleFiles(Array.from(el.epubInput.files));
+    el.epubInput.value = '';
+  });
+  el.backupInput.addEventListener('change', () => {
+    handleBackupFile(el.backupInput.files[0]);
+    el.backupInput.value = '';
+  });
+
+  wireDragAndDrop();
+
+  // --- atajos
+  document.addEventListener('keydown', (event) => {
+    if (event.key === '/' && !isTyping(event.target)) {
+      event.preventDefault();
+      el.search.focus();
+    }
+  });
+}
+
+function clearFilters() {
+  state.filters = { ...state.filters, search: '', status: '', minRating: 0, year: '' };
+  el.search.value = '';
+  el.status.value = '';
+  el.rating.value = '0';
+  el.year.value = '';
+  renderLibrary();
+}
+
+function toggleMenu(force) {
+  const show = force ?? el.menuPanel.hidden;
+  el.menuPanel.hidden = !show;
+  el.menuToggle.setAttribute('aria-expanded', String(show));
+}
+
+async function menuAction(action) {
+  switch (action) {
+    case 'manual': openBook(emptyBook(state.profile), { isNew: true }); break;
+    case 'switch': openGate(); break;
+    case 'profiles': openProfiles(); break;
+    case 'export': await doExport(); break;
+    case 'import': el.backupInput.click(); break;
+    case 'theme': await toggleTheme(); break;
+    case 'storage': await showStorage(); break;
+  }
+}
+
+/* ------------------------------------------------------- arrastrar y soltar */
+
+function wireDragAndDrop() {
+  // Los eventos dragenter/dragleave se disparan tambien al pasar sobre hijos,
+  // asi que se lleva un contador en vez de un booleano.
+  let depth = 0;
+
+  window.addEventListener('dragenter', (event) => {
+    if (!hasFiles(event)) return;
+    event.preventDefault();
+    depth += 1;
+    el.dropzone.hidden = false;
+  });
+
+  window.addEventListener('dragover', (event) => {
+    if (hasFiles(event)) event.preventDefault();
+  });
+
+  window.addEventListener('dragleave', () => {
+    depth = Math.max(0, depth - 1);
+    if (depth === 0) el.dropzone.hidden = true;
+  });
+
+  window.addEventListener('drop', (event) => {
+    if (!hasFiles(event)) return;
+    event.preventDefault();
+    depth = 0;
+    el.dropzone.hidden = true;
+    handleFiles(Array.from(event.dataTransfer.files));
+  });
+}
+
+function hasFiles(event) {
+  return Array.from(event.dataTransfer?.types || []).includes('Files');
+}
+
+/* --------------------------------------------------------------- importar */
+
+async function handleFiles(files) {
+  const epubs = files.filter((file) => /\.epub$/i.test(file.name) || file.type === 'application/epub+zip');
+  const backups = files.filter((file) => /\.json$/i.test(file.name));
+
+  if (backups.length) return handleBackupFile(backups[0]);
+
+  if (!epubs.length) {
+    toast('Solo entiendo ficheros .epub (o una copia de seguridad .json).', { error: true });
+    return;
+  }
+
+  const notice = progressToast(epubs.length);
+  const result = await importEpubs(epubs, state.profile, state.books, (done, total, name) => {
+    notice.update(done, total, name);
+  });
+  notice.close();
+
+  await loadBooks();
+
+  const parts = [];
+  if (result.added.length) parts.push(`${result.added.length} libro${result.added.length > 1 ? 's' : ''} añadido${result.added.length > 1 ? 's' : ''}`);
+  if (result.skipped.length) parts.push(`${result.skipped.length} ya estaba${result.skipped.length > 1 ? 'n' : ''} en la estantería`);
+  if (parts.length) toast(parts.join(' · '));
+
+  for (const failure of result.failed) {
+    toast(`No pude leer «${failure.name}»: ${failure.message}`, { error: true });
+  }
+
+  // Con un solo libro, abrir la ficha invita a puntuarlo en el momento.
+  if (result.added.length === 1) {
+    openBook(state.books.find((b) => b.id === result.added[0].id));
+  }
+}
+
+async function handleBackupFile(file) {
+  if (!file) return;
+  try {
+    const payload = JSON.parse(await file.text());
+    const count = await importBackup(payload, null);
+    // Un backup puede traer perfiles que aun no existen en este dispositivo.
+    const incoming = new Set(payload.books.map((book) => book.profile).filter(Boolean));
+    const merged = Array.from(new Set([...state.profiles, ...incoming]));
+    if (merged.length !== state.profiles.length) {
+      state.profiles = merged;
+      await db.setSetting('profiles', merged);
+    }
+    await loadBooks();
+    toast(`Copia restaurada: ${count} libros.`);
+  } catch (error) {
+    toast(`No pude leer la copia de seguridad: ${error.message}`, { error: true });
+  }
+}
+
+async function doExport() {
+  const books = await db.listAllBooks();
+  if (!books.length) return toast('No hay nada que exportar todavía.', { error: true });
+
+  const payload = await exportBackup(books);
+  const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `mi-biblioteca-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+  toast(`Exportados ${books.length} libros (todos los perfiles).`);
+}
+
+async function toggleTheme() {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  applyTheme(next);
+  await db.setSetting('theme', next);
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+}
+
+async function showStorage() {
+  const estimate = await db.storageEstimate();
+  if (!estimate) return toast('Tu navegador no informa del espacio usado.');
+  const used = (estimate.usage / 1024 / 1024).toFixed(1);
+  const quota = (estimate.quota / 1024 / 1024 / 1024).toFixed(1);
+  toast(`Ocupas ${used} MB de los ~${quota} GB disponibles en este navegador.`);
+}
+
+/* =========================================================== ficha de libro */
+
+function openBook(book, { isNew = false } = {}) {
+  if (!book) return;
+  const draft = structuredClone(book);
+
+  el.bookDialog.innerHTML = bookDialogHtml(draft, isNew);
+  el.bookDialog.showModal();
+
+  const form = el.bookDialog.querySelector('form');
+  const coverBox = el.bookDialog.querySelector('.detail-cover');
+  let coverBlob = null; // portada nueva elegida a mano, si la hay
+
+  if (draft.hasCover) {
+    coverUrl(draft.id).then((url) => {
+      if (url) coverBox.insertAdjacentHTML('afterbegin', `<img src="${url}" alt="">`);
+    });
+  }
+
+  // --- estrellas
+  const starsBox = form.querySelector('.stars');
+  paintStars(starsBox, draft.rating);
+  starsBox.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    const index = Number(button.dataset.index);
+    const rect = button.getBoundingClientRect();
+    const value = event.clientX - rect.left < rect.width / 2 ? index - 0.5 : index;
+    draft.rating = draft.rating === value ? 0 : value; // volver a pulsar quita la nota
+    paintStars(starsBox, draft.rating);
+  });
+
+  // --- favorito
+  const favButton = form.querySelector('[data-role="favorite"]');
+  paintFavorite(favButton, draft.favorite);
+  favButton.addEventListener('click', () => {
+    draft.favorite = !draft.favorite;
+    paintFavorite(favButton, draft.favorite);
+  });
+
+  // --- al marcar como leído, proponer la fecha de hoy
+  form.status.addEventListener('change', () => {
+    if (form.status.value === 'read' && !form.finishedAt.value) {
+      form.finishedAt.value = new Date().toISOString().slice(0, 10);
+    }
+  });
+
+  // --- portada manual
+  form.querySelector('[data-role="pick-cover"]').addEventListener('click', async () => {
+    const file = await pickImage();
+    if (!file) return;
+    coverBlob = file;
+    const url = URL.createObjectURL(file);
+    coverBox.querySelector('img')?.remove();
+    coverBox.querySelector('.cover-fallback')?.remove();
+    coverBox.insertAdjacentHTML('afterbegin', `<img src="${url}" alt="">`);
+  });
+
+  // --- borrar
+  form.querySelector('[data-role="delete"]')?.addEventListener('click', async () => {
+    if (!confirm(`¿Quitar «${draft.title}» de la estantería de ${state.profile}?`)) return;
+    await db.deleteBook(draft.id);
+    releaseCover(draft.id);
+    state.books = state.books.filter((b) => b.id !== draft.id);
+    el.bookDialog.close();
+    render();
+    toast('Libro eliminado.');
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const data = new FormData(form);
+
+    Object.assign(draft, {
+      title: (data.get('title') || '').trim() || '(sin título)',
+      authors: splitList(data.get('authors')),
+      series: (data.get('series') || '').trim(),
+      seriesIndex: data.get('seriesIndex') ? Number(data.get('seriesIndex')) : null,
+      status: data.get('status'),
+      startedAt: data.get('startedAt') || '',
+      finishedAt: data.get('finishedAt') || '',
+      review: (data.get('review') || '').trim(),
+    });
+
+    if (coverBlob) {
+      await db.putCover(draft.id, coverBlob);
+      releaseCover(draft.id);
+      draft.hasCover = true;
+    }
+
+    await saveBook(draft);
+    el.bookDialog.close();
+  });
+
+  form.querySelector('[data-role="cancel"]').addEventListener('click', () => el.bookDialog.close());
+
+  el.bookDialog.addEventListener('close', () => { el.bookDialog.innerHTML = ''; }, { once: true });
+  form.querySelector('[name="title"]').focus();
+}
+
+function bookDialogHtml(book, isNew) {
+  const meta = [
+    ['Editorial', book.publisher],
+    ['Publicado', book.year],
+    ['Idioma', book.language],
+    ['ISBN', book.isbn],
+    ['Fichero', book.fileName],
+  ].filter(([, value]) => value);
+
+  return `
+  <form method="dialog">
+    <div class="dialog-body">
+      <div class="detail-side">
+        <div class="detail-cover">${book.hasCover ? '' : fallbackCover(book)}</div>
+        <button type="button" class="btn btn-ghost" data-role="pick-cover">Cambiar portada</button>
+        ${meta.length ? `<div class="detail-meta">${meta.map(([k, v]) => `<div><strong>${esc(k)}:</strong> ${esc(String(v))}</div>`).join('')}</div>` : ''}
+        ${book.subjects?.length ? `<div class="chips">${book.subjects.slice(0, 6).map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
+      </div>
+
+      <div class="detail-main">
+        <div class="dialog-head">
+          <div class="grow field field-title">
+            <label for="bd-title">Título</label>
+            <input id="bd-title" name="title" value="${esc(book.title)}" placeholder="Título del libro" required>
+          </div>
+          <button type="button" class="btn btn-icon" data-role="favorite"
+                  aria-pressed="${book.favorite}" title="Marcar como favorito">${book.favorite ? '★' : '☆'}</button>
+        </div>
+
+        <div class="field">
+          <label for="bd-authors">Autores <span style="text-transform:none">(separados por comas)</span></label>
+          <input id="bd-authors" name="authors" value="${esc(book.authors.join(', '))}">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="bd-series">Saga</label>
+            <input id="bd-series" name="series" value="${esc(book.series || '')}">
+          </div>
+          <div class="field">
+            <label for="bd-series-index">Nº en la saga</label>
+            <input id="bd-series-index" name="seriesIndex" type="number" step="0.5" value="${book.seriesIndex ?? ''}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Puntuación</label>
+          <div class="rating-row">
+            <div class="stars" role="group" aria-label="Puntuación de 0 a 5">
+              ${[1, 2, 3, 4, 5].map((i) => `
+                <button type="button" data-index="${i}" aria-label="${i} estrellas">
+                  <span class="star-glyph">★</span>
+                </button>`).join('')}
+            </div>
+            <span class="rating-value"></span>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="bd-status">Estado</label>
+            <select id="bd-status" name="status">
+              ${Object.entries(STATUSES).map(([key, { label }]) =>
+                `<option value="${key}" ${book.status === key ? 'selected' : ''}>${esc(label)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label for="bd-finished">Terminado el</label>
+            <input id="bd-finished" name="finishedAt" type="date" value="${esc(book.finishedAt || '')}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="bd-started">Empezado el</label>
+          <input id="bd-started" name="startedAt" type="date" value="${esc(book.startedAt || '')}">
+        </div>
+
+        <div class="field">
+          <label for="bd-review">Tu reseña</label>
+          <textarea id="bd-review" name="review" placeholder="¿Qué te ha parecido?">${esc(book.review || '')}</textarea>
+        </div>
+
+        ${book.description ? `<div class="field">
+          <label>Sinopsis del EPUB</label>
+          <div class="description">${esc(book.description)}</div>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      ${isNew ? '' : '<button type="button" class="btn btn-danger" data-role="delete">Eliminar</button>'}
+      <span class="spacer"></span>
+      <button type="button" class="btn" data-role="cancel">Cancelar</button>
+      <button type="submit" class="btn btn-primary">Guardar</button>
+    </div>
+  </form>`;
+}
+
+function paintStars(box, rating) {
+  box.querySelectorAll('button').forEach((button) => {
+    const index = Number(button.dataset.index);
+    const fill = rating >= index ? 'full' : rating >= index - 0.5 ? 'half' : 'none';
+    button.dataset.fill = fill;
+  });
+  box.parentElement.querySelector('.rating-value').textContent = rating ? `${rating}/5` : 'Sin nota';
+}
+
+function paintFavorite(button, favorite) {
+  button.textContent = favorite ? '★' : '☆';
+  button.setAttribute('aria-pressed', String(favorite));
+  button.style.color = favorite ? 'var(--star)' : '';
+}
+
+async function pickImage() {
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.addEventListener('change', () => resolve(input.files[0] || null), { once: true });
+    input.addEventListener('cancel', () => resolve(null), { once: true });
+    input.click();
+  });
+}
+
+function releaseCover(id) {
+  const url = coverUrls.get(id);
+  if (url) {
+    URL.revokeObjectURL(url);
+    coverUrls.delete(id);
+  }
+}
+
+/* ============================================================ perfiles UI */
+
+async function openProfiles() {
+  const all = await db.listAllBooks();
+  const counts = new Map();
+  all.forEach((book) => counts.set(book.profile, (counts.get(book.profile) || 0) + 1));
+
+  el.profilesDialog.innerHTML = `
+    <form method="dialog">
+      <div class="dialog-body">
+        <h2>Perfiles</h2>
+        <p class="detail-meta">Cada perfil tiene su propia estantería. Renombra uno y sus libros se
+        renombran con él; para borrarlo, primero tiene que quedarse vacío.</p>
+        <div id="profile-rows">
+          ${state.profiles.map((name, i) => `
+            <div class="profile-row" data-original="${esc(name)}">
+              <input name="p${i}" value="${esc(name)}" aria-label="Nombre del perfil">
+              <span class="count">${counts.get(name) || 0} libros</span>
+              <button type="button" class="btn btn-danger" data-remove="${esc(name)}"
+                      ${counts.get(name) ? 'disabled title="Tiene libros dentro"' : ''}>Borrar</button>
+            </div>`).join('')}
+        </div>
+        <button type="button" class="btn" data-role="add-profile" style="margin-top:1rem">＋ Nuevo perfil</button>
+      </div>
+      <div class="dialog-footer">
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-role="cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>`;
+
+  el.profilesDialog.showModal();
+  const dialog = el.profilesDialog;
+  const rows = dialog.querySelector('#profile-rows');
+
+  dialog.querySelector('[data-role="add-profile"]').addEventListener('click', () => {
+    const index = rows.children.length;
+    rows.insertAdjacentHTML('beforeend', `
+      <div class="profile-row" data-original="">
+        <input name="p${index}" value="" placeholder="Nombre" aria-label="Nombre del perfil">
+        <span class="count">0 libros</span>
+        <button type="button" class="btn btn-danger" data-remove="">Borrar</button>
+      </div>`);
+    rows.lastElementChild.querySelector('input').focus();
+  });
+
+  rows.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-remove]');
+    if (button && !button.disabled) button.closest('.profile-row').remove();
+  });
+
+  dialog.querySelector('[data-role="cancel"]').addEventListener('click', () => dialog.close());
+
+  dialog.querySelector('form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const renames = [];
+    const names = [];
+    for (const row of rows.querySelectorAll('.profile-row')) {
+      const name = row.querySelector('input').value.trim();
+      if (!name || names.includes(name)) continue;
+      names.push(name);
+      const original = row.dataset.original;
+      if (original && original !== name) renames.push([original, name]);
+    }
+
+    if (!names.length) return toast('Necesitas al menos un perfil.', { error: true });
+
+    // Renombrar un perfil implica reetiquetar sus libros, o quedarian huerfanos.
+    for (const [from, to] of renames) {
+      const books = await db.listBooks(from);
+      if (books.length) await db.putBooks(books.map((book) => ({ ...book, profile: to })));
+      if (state.profile === from) state.profile = to;
+    }
+
+    state.profiles = names;
+    if (!names.includes(state.profile)) state.profile = names[0];
+    await db.setSetting('profiles', names);
+    await db.setSetting('activeProfile', state.profile);
+    // Si este dispositivo ya recordaba a alguien, se actualiza por si le han
+    // cambiado el nombre. Si aun no habia elegido nadie, no se decide por el.
+    if (readRemembered()) writeRemembered(state.profile);
+
+    dialog.close();
+    await loadBooks();
+    if (!el.gate.hidden) renderGate();
+    toast('Perfiles actualizados.');
+  });
+
+  dialog.addEventListener('close', () => { dialog.innerHTML = ''; }, { once: true });
+}
+
+/* ================================================================= avisos */
+
+function toast(message, { error = false, sticky = false } = {}) {
+  const node = document.createElement('div');
+  node.className = `toast${error ? ' is-error' : ''}`;
+  node.textContent = message;
+  el.toasts.append(node);
+  if (!sticky) setTimeout(() => node.remove(), 5200);
+  return node;
+}
+
+function progressToast(total) {
+  const node = toast(`Leyendo ${total} EPUB…`, { sticky: true });
+  const bar = document.createElement('progress');
+  bar.max = total;
+  bar.value = 0;
+  node.append(bar);
+
+  return {
+    update(done, max, name) {
+      node.firstChild.textContent = `Leyendo ${done}/${max} — ${name}`;
+      bar.value = done;
+    },
+    close() { node.remove(); },
+  };
+}
+
+/* ================================================================ helpers */
+
+function esc(text) {
+  return String(text ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[char]));
+}
+
+function splitList(value) {
+  return String(value || '').split(',').map((part) => part.trim()).filter(Boolean);
+}
+
+function debounce(fn, wait) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  };
+}
+
+function isTyping(node) {
+  return /^(INPUT|TEXTAREA|SELECT)$/.test(node.tagName) || node.isContentEditable;
+}

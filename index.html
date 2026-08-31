@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mi biblioteca</title>
+  <meta name="description" content="Catálogo personal de libros leídos, con portadas extraídas de los EPUB.">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#16130f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Puerta de entrada estilo Netflix. Va oculta y solo se muestra cuando no hay
+     perfil recordado en este dispositivo, o cuando se pide cambiar de perfil. -->
+<section class="gate" id="gate" hidden>
+  <div class="gate-inner">
+    <h2 class="gate-title">¿Quién está leyendo?</h2>
+    <div class="gate-profiles" id="gate-profiles"></div>
+    <div class="gate-actions">
+      <button type="button" class="btn btn-ghost" data-action="profiles">Gestionar perfiles</button>
+      <button type="button" class="btn btn-ghost" id="gate-cancel" hidden>Cancelar</button>
+    </div>
+  </div>
+</section>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">📚</span>
+    <h1>Mi biblioteca</h1>
+  </div>
+
+  <div class="topbar-actions">
+    <button type="button" class="profile-current" id="profile-current" title="Cambiar de perfil"></button>
+    <button type="button" class="btn btn-primary" id="add-books">
+      <span aria-hidden="true">＋</span> Añadir EPUB
+    </button>
+    <div class="menu">
+      <button type="button" class="btn btn-icon" id="menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Más opciones">⋯</button>
+      <div class="menu-panel" id="menu-panel" hidden>
+        <button type="button" data-action="manual">Añadir libro a mano</button>
+        <hr>
+        <button type="button" data-action="switch">Cambiar de perfil</button>
+        <button type="button" data-action="profiles">Gestionar perfiles</button>
+        <hr>
+        <button type="button" data-action="export">Exportar copia de seguridad</button>
+        <button type="button" data-action="import">Importar copia de seguridad</button>
+        <hr>
+        <button type="button" data-action="theme">Cambiar tema</button>
+        <button type="button" data-action="storage">Espacio usado</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="stats" id="stats" aria-label="Resumen"></section>
+
+<section class="toolbar">
+  <div class="search">
+    <span class="search-icon" aria-hidden="true">⌕</span>
+    <input type="search" id="search" placeholder="Buscar por título, autor, saga, reseña…" autocomplete="off" aria-label="Buscar">
+  </div>
+
+  <select id="filter-status" aria-label="Filtrar por estado">
+    <option value="">Todos los estados</option>
+  </select>
+
+  <select id="filter-rating" aria-label="Filtrar por puntuación">
+    <option value="0">Cualquier nota</option>
+    <option value="5">5 estrellas</option>
+    <option value="4">4+ estrellas</option>
+    <option value="3">3+ estrellas</option>
+  </select>
+
+  <select id="filter-year" aria-label="Filtrar por año de lectura">
+    <option value="">Cualquier año</option>
+  </select>
+
+  <select id="sort" aria-label="Ordenar por"></select>
+
+  <div class="view-toggle" role="group" aria-label="Vista">
+    <button type="button" data-view="grid" class="is-active" aria-label="Vista de portadas">▦</button>
+    <button type="button" data-view="list" aria-label="Vista de lista">☰</button>
+  </div>
+</section>
+
+<main id="library" class="library view-grid" aria-live="polite"></main>
+
+<div class="empty" id="empty" hidden></div>
+
+<!-- Entradas de fichero ocultas; se disparan desde los botones -->
+<input type="file" id="epub-input" accept=".epub,application/epub+zip" multiple hidden>
+<input type="file" id="backup-input" accept=".json,application/json" hidden>
+
+<!-- Overlay de arrastrar y soltar sobre toda la ventana -->
+<div class="dropzone" id="dropzone" hidden>
+  <div class="dropzone-inner">
+    <span aria-hidden="true">📖</span>
+    <p>Suelta aquí tus EPUB</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<dialog id="book-dialog" class="dialog dialog-book"></dialog>
+<dialog id="profiles-dialog" class="dialog dialog-profiles"></dialog>
+
+<noscript>
+  <p style="padding:2rem;text-align:center">Esta página necesita JavaScript para leer tus EPUB.</p>
+</noscript>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
