@@ -508,11 +508,13 @@ function cardHtml(book) {
     <button type="button" class="card" data-id="${book.id}">
       <div class="card-cover" data-cover="${book.id}">
         ${coverMarkup(book)}
-        <div class="card-badges">
-          <span class="badge">${esc(status.icon)} ${esc(status.label)}</span>
-          ${book.favorite ? '<span class="badge badge-fav">★</span>' : ''}
-        </div>
         ${book.rating ? `<div class="card-rating">${stars(book.rating)}</div>` : ''}
+      </div>
+      <!-- Fuera de .card-cover para poder recolocarlo: en la rejilla va encima
+           de la portada y en la lista, como una columna más de la fila. -->
+      <div class="card-badges">
+        <span class="badge" data-status="${esc(book.status)}">${esc(status.icon)} ${esc(status.label)}</span>
+        ${book.favorite ? '<span class="badge badge-fav">★</span>' : ''}
       </div>
       <div class="card-main">
         <div class="card-title">${esc(book.title)}</div>
@@ -520,7 +522,7 @@ function cardHtml(book) {
       </div>
       <div class="card-side">
         <span class="list-stars">${book.rating ? stars(book.rating) : ''}</span>
-        <span>${book.finishedAt ? esc(book.finishedAt) : ''}</span>
+        <span class="list-date">${book.finishedAt ? esc(book.finishedAt) : ''}</span>
       </div>
     </button>
   `;

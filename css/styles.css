@@ -473,6 +473,7 @@ button, input, select, textarea {
 }
 
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -531,9 +532,11 @@ button, input, select, textarea {
   color: var(--text-faint);
 }
 
-.card-badges {
+/* En la rejilla se superpone a la portada; el ancla es .card, no .card-cover,
+   para que en la lista pueda salir del recuadro y ponerse en fila. */
+.view-grid .card-badges {
   position: absolute;
-  inset: .4rem .4rem auto .4rem;
+  inset: var(--space-2) var(--space-2) auto var(--space-2);
   display: flex;
   justify-content: space-between;
   pointer-events: none;
@@ -601,13 +604,44 @@ button, input, select, textarea {
   box-shadow: none;
 }
 .view-list .card:hover .card-cover { transform: none; box-shadow: none; }
-.view-list .card-badges,
 .view-list .card-rating,
 .view-list .cover-fallback .cf-title,
 .view-list .cover-fallback .cf-author { display: none; }
-.view-list .card-main { flex: 1; min-width: 0; }
+
+/* En la lista el estado es una columna más de la fila, no un overlay */
+.view-list .card-badges {
+  display: flex;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+  order: 4;
+}
+/* Aquí el badge va sobre el fondo de la app, no sobre una portada: el velo
+   negro que necesita en la rejilla aquí sería una mancha. */
+.view-list .badge {
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  backdrop-filter: none;
+  font-weight: 500;
+}
+.view-list .badge[data-status="read"] {
+  color: var(--accent-strong);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.view-list .badge[data-status="reading"] {
+  color: var(--star);
+  border-color: color-mix(in srgb, var(--star) 45%, transparent);
+}
+.view-list .badge[data-status="abandoned"] {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+.view-list .badge-fav { color: var(--star); border-color: transparent; background: transparent; }
+.view-list .card-main { flex: 1; min-width: 0; order: 2; }
 .view-list .card-title { -webkit-line-clamp: 1; line-clamp: 1; }
+.view-list .card-cover { order: 1; }
 .view-list .card-side {
+  order: 3;
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -1125,6 +1159,11 @@ button, input, select, textarea {
 
   .view-list .card { padding: var(--space-2); }
   .view-list .card-cover { width: 40px; flex-basis: 40px; }
+  /* Con estado + nota + fecha, al título le quedaban 63px de 343: menos que a
+     la fecha. La fecha ya está en la ficha, así que aquí cede el sitio. */
+  .view-list .list-date { display: none; }
+  .view-list .card-main { flex: 1 1 auto; }
+  .view-list .card-side { flex: 0 0 auto; }
 
   /* --- fichas a pantalla completa: los modales flotantes se manejan fatal */
   .dialog {
