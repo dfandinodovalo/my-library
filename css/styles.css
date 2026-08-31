@@ -996,13 +996,6 @@ button, input, select, textarea {
     scrollbar-width: none;
   }
   .stats::-webkit-scrollbar { display: none; }
-  /* El padding-right de un contenedor con scroll horizontal se ignora al llegar
-     al final, así que el margen se recupera con un separador de verdad. */
-  .stats::after,
-  .scopes::after {
-    content: '';
-    flex: 0 0 calc(var(--gutter) - var(--space-2));
-  }
   .stat {
     flex: 0 0 auto;
     min-width: 92px;
