@@ -66,6 +66,13 @@ const el = {
   profilesDialog: $('#profiles-dialog'),
   menuPanel: $('#menu-panel'),
   menuToggle: $('#menu-toggle'),
+  fab: $('#fab'),
+  fabMain: $('#fab-main'),
+  fabActions: $('#fab-actions'),
+  filters: $('#filters'),
+  filtersToggle: $('#filters-toggle'),
+  filtersCount: $('#filters-count'),
+  backdrop: $('#sheet-backdrop'),
 };
 
 /* ==================================================================== init */
@@ -471,6 +478,7 @@ function renderYearFilter() {
 }
 
 function renderLibrary() {
+  renderFiltersCount();
   const books = applyFilters(state.books, state.filters);
 
   el.library.className = `library view-${state.view}`;
@@ -486,8 +494,9 @@ function renderLibrary() {
       ? `<h2>Nada por aquí</h2><p>Ningún libro de <strong>${esc(state.profile)}</strong> encaja con estos filtros.</p>
          <button type="button" class="btn" data-action="clear-filters">Quitar filtros</button>`
       : `<h2>La estantería de ${esc(state.profile)} está vacía</h2>
-         <p>Arrastra tus ficheros <strong>.epub</strong> a esta ventana y sacaré el título, el autor y la portada de cada uno.</p>
-         <button type="button" class="btn btn-primary" data-action="add">Elegir EPUB</button>`;
+         <p>Toca el botón <strong>＋</strong> de abajo para subir un <strong>.epub</strong> —
+         saco el título, el autor y la portada— o para añadir un libro a mano.</p>
+         <button type="button" class="btn btn-primary" data-action="add">Subir un EPUB</button>`;
   }
 }
 
@@ -673,8 +682,34 @@ function wireEvents() {
     menuAction(action);
   });
 
+  // --- botón flotante de añadir
+  el.fabMain.addEventListener('click', () => toggleFab());
+  el.fabActions.addEventListener('click', (event) => {
+    const action = event.target.closest('[data-action]')?.dataset.action;
+    if (!action) return;
+    toggleFab(false);
+    if (action === 'add-epub') el.epubInput.click();
+    if (action === 'add-manual') openBook(emptyBook(state.profile), { isNew: true });
+  });
+
+  // --- hoja de filtros
+  el.filtersToggle.addEventListener('click', () => toggleFilters());
+  $('#filters-close').addEventListener('click', () => toggleFilters(false));
+  $('#filters-apply').addEventListener('click', () => toggleFilters(false));
+  el.filters.querySelector('[data-action="clear-filters"]').addEventListener('click', clearFilters);
+
+  el.backdrop.addEventListener('click', () => {
+    toggleFab(false);
+    toggleFilters(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (!el.fabActions.hidden) toggleFab(false);
+    else if (el.filters.classList.contains('is-open')) toggleFilters(false);
+  });
+
   // --- entradas de fichero
-  $('#add-books').addEventListener('click', () => el.epubInput.click());
   el.epubInput.addEventListener('change', () => {
     handleFiles(Array.from(el.epubInput.files));
     el.epubInput.value = '';
@@ -704,6 +739,36 @@ function clearFilters() {
   renderLibrary();
 }
 
+/* ------------------------------------------------- hojas y botón flotante */
+
+function toggleFab(force) {
+  const show = force ?? el.fabActions.hidden;
+  el.fabActions.hidden = !show;
+  el.fabMain.setAttribute('aria-expanded', String(show));
+  el.backdrop.hidden = !show && !el.filters.classList.contains('is-open');
+  if (show) el.fabActions.querySelector('button').focus();
+}
+
+function toggleFilters(force) {
+  const show = force ?? !el.filters.classList.contains('is-open');
+  el.filters.classList.toggle('is-open', show);
+  el.filtersToggle.setAttribute('aria-expanded', String(show));
+  el.backdrop.hidden = !show && el.fabActions.hidden;
+  // El botón flotante taparía el pie de la hoja, y con los filtros abiertos
+  // añadir un libro tampoco es lo que se está intentando hacer.
+  el.fab.hidden = show;
+  // Se bloquea el scroll del fondo: si no, arrastrar dentro de la hoja mueve la lista.
+  document.body.style.overflow = show ? 'hidden' : '';
+}
+
+/** Cuántos filtros hay puestos, para avisarlo en el botón cuando está plegado. */
+function renderFiltersCount() {
+  const { status, minRating, year } = state.filters;
+  const active = [status, minRating, year].filter(Boolean).length;
+  el.filtersCount.hidden = active === 0;
+  el.filtersCount.textContent = String(active);
+}
+
 function toggleMenu(force) {
   const show = force ?? el.menuPanel.hidden;
   el.menuPanel.hidden = !show;
@@ -712,7 +777,6 @@ function toggleMenu(force) {
 
 async function menuAction(action) {
   switch (action) {
-    case 'manual': openBook(emptyBook(state.profile), { isNew: true }); break;
     case 'switch': openGate(); break;
     case 'profiles': openProfiles(); break;
     case 'sync-settings': openSyncSettings(); break;

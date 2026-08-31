@@ -366,8 +366,16 @@ button, input, select, textarea {
   flex-wrap: wrap;
   gap: .55rem;
   align-items: center;
-  padding: 1.1rem clamp(1rem, 4vw, 2.5rem) .4rem;
+  padding: .8rem clamp(1rem, 4vw, 2.5rem) .4rem;
 }
+
+.filters { display: contents; }   /* en escritorio los hijos van en la propia toolbar */
+.filters-toggle,
+.filters-head,
+.filters-foot { display: none; }  /* solo tienen sentido en la hoja móvil */
+
+.filter-field > span { display: none; }
+.filter-field { display: contents; }
 
 .search { position: relative; flex: 1 1 260px; }
 .search-icon {
@@ -388,7 +396,7 @@ button, input, select, textarea {
 }
 .search input::-webkit-search-cancel-button { filter: grayscale(1); }
 
-.toolbar select {
+.filters select {
   padding: .55rem .7rem;
   background: var(--bg-elev);
   border: 1px solid var(--border);
@@ -665,12 +673,14 @@ button, input, select, textarea {
 }
 .detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-.detail-side { display: flex; flex-direction: column; gap: .8rem; }
+.detail-side { display: flex; flex-direction: column; gap: .8rem; min-width: 0; }
 .detail-meta {
   font-size: .78rem;
   color: var(--text-faint);
   line-height: 1.6;
+  min-width: 0;
 }
+/* Los nombres de fichero de los EPUB son largos y sin espacios donde partir */
 .detail-meta div { overflow-wrap: anywhere; }
 
 .detail-main { min-width: 0; display: flex; flex-direction: column; gap: 1rem; }
@@ -811,28 +821,308 @@ button, input, select, textarea {
 .profile-row input { flex: 1; padding: .45rem .6rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
 .profile-row .count { font-size: .8rem; color: var(--text-faint); white-space: nowrap; }
 
+/* ------------------------------------------------------- añadir libro (FAB) */
+
+/* Fijo abajo a la derecha: en un móvil es la única zona que el pulgar alcanza
+   sin recolocar la mano, y añadir libros es la acción principal de la app. */
+.fab {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .6rem;
+}
+
+.fab-main {
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 1.9rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 35%);
+  transition: transform .2s ease, background .15s;
+}
+.fab-main:hover { background: var(--accent-strong); }
+.fab-main[aria-expanded="true"] { transform: rotate(45deg); }
+
+.fab-actions {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  align-items: flex-end;
+  animation: fab-in .16s ease;
+}
+
+@keyframes fab-in { from { opacity: 0; transform: translateY(8px); } }
+
+.fab-actions button {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: var(--shadow);
+  min-height: 56px;
+}
+.fab-actions button:hover { background: var(--bg-elev-2); }
+.fab-actions .fab-icon { font-size: 1.3rem; }
+.fab-actions strong { display: block; font-size: .92rem; font-weight: 600; }
+.fab-actions small { display: block; font-size: .75rem; color: var(--text-faint); }
+
+/* Fondo que oscurece al abrir el FAB o la hoja de filtros */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgb(0 0 0 / 45%);
+  backdrop-filter: blur(2px);
+}
+
 /* ----------------------------------------------------------- responsive */
 
-@media (max-width: 720px) {
-  :root { --cover-w: 118px; }
+@media (max-width: 760px) {
+  :root {
+    --cover-w: 105px;
+    --radius: 14px;
+  }
 
-  .topbar { gap: .5rem; }
-  /* En móvil no cabe todo: sobra el titulo (ya esta en la pestaña) y el
-     nombre del perfil, que se deduce del avatar. */
+  /* --- cabecera compacta: el título ocupa espacio que necesitan los libros */
+  .topbar { gap: .5rem; padding: .6rem .9rem; }
   .brand h1 { display: none; }
-  .brand-mark { font-size: 1.6rem; }
-  .profile-current { padding: .3rem; }
+  .brand-mark { font-size: 1.5rem; }
+  .profile-current { padding: .25rem; border-color: transparent; background: transparent; }
   .profile-current .profile-current-name { display: none; }
+  .profile-current .avatar { width: 34px; font-size: .9rem; }
+  .sync-button span:not(.dot) { display: none; }
+  .sync-button { padding: .6rem; }
+  .btn-icon { padding: .6rem .7rem; font-size: 1.1rem; }
 
-  .stats { gap: .4rem; }
-  .stat { flex-basis: calc(50% - .2rem); padding: .6rem .7rem; }
-  .stat-value { font-size: 1.3rem; }
+  /* Menú desplegable a ancho completo: los objetivos de 40px fallan al pulsar */
+  .menu-panel {
+    position: fixed;
+    left: .75rem;
+    right: .75rem;
+    top: auto;
+    bottom: calc(.75rem + env(safe-area-inset-bottom, 0px));
+    min-width: 0;
+    padding: .5rem;
+  }
+  .menu-panel button { padding: .85rem .8rem; font-size: .95rem; }
 
-  .toolbar select, .view-toggle { flex: 1 1 auto; }
+  /* --- estadísticas: una tira que se desliza, no cinco tarjetas gigantes */
+  .stats {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    gap: .45rem;
+    padding: .7rem .9rem 0;
+    scrollbar-width: none;
+  }
+  .stats::-webkit-scrollbar { display: none; }
+  .stat {
+    flex: 0 0 auto;
+    min-width: 92px;
+    padding: .5rem .7rem;
+    scroll-snap-align: start;
+  }
+  .stat-value { font-size: 1.15rem; }
+  .stat-label { font-size: .64rem; letter-spacing: .05em; }
 
-  .dialog-body { grid-template-columns: 1fr; }
-  .detail-cover { width: 140px; margin: 0 auto; }
+  /* --- buscador + botón de filtros en una sola fila */
+  .toolbar { padding: .7rem .9rem .2rem; gap: .45rem; flex-wrap: nowrap; }
+  .search { flex: 1 1 auto; min-width: 0; }
+  .search input { padding: .7rem .8rem .7rem 2.2rem; font-size: 1rem; }
+
+  .filters-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .7rem .85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elev);
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: .88rem;
+  }
+  .filters-toggle[aria-expanded="true"],
+  .filters-toggle:has(.filters-count:not([hidden])) {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+  .filters-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 .25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: .7rem;
+    font-weight: 700;
+  }
+
+  /* --- filtros como hoja inferior deslizante */
+  .filters {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 85;
+    max-height: 85dvh;
+    overflow-y: auto;
+    padding: .5rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+    background: var(--bg-elev);
+    border-top: 1px solid var(--border);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -10px 30px rgb(0 0 0 / 35%);
+    transform: translateY(101%);
+    /* visibility, y no solo transform: si no, la hoja cerrada sigue estando
+       fuera de pantalla pero enfocable con el tabulador y visible para un
+       lector de pantalla. Se difiere para que la animación de cierre se vea. */
+    visibility: hidden;
+    transition: transform .22s ease, visibility 0s linear .22s;
+  }
+  .filters.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform .22s ease, visibility 0s;
+  }
+
+  .filters-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    padding: .5rem 0 .8rem;
+    background: var(--bg-elev);
+  }
+  .filters-head h2 { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    margin-bottom: .9rem;
+  }
+  .filter-field > span {
+    display: block;
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--text-faint);
+  }
+  .filters select { width: 100%; padding: .8rem .7rem; font-size: 1rem; }
+  .filters .view-toggle { width: 100%; }
+  .filters .view-toggle button { flex: 1; padding: .7rem; font-size: 1.1rem; }
+
+  .filters-foot {
+    display: flex;
+    gap: .5rem;
+    position: sticky;
+    bottom: 0;
+    padding: .8rem 0 .2rem;
+    background: var(--bg-elev);
+  }
+  .filters-foot .btn { flex: 1; justify-content: center; padding: .8rem; }
+
+  /* --- pestañas de ámbito deslizables */
+  .scopes {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: .7rem .9rem 0;
+    scrollbar-width: none;
+  }
+  .scopes::-webkit-scrollbar { display: none; }
+  .scope-tab { flex: 0 0 auto; padding: .45rem .85rem .45rem .4rem; }
+
+  /* --- rejilla: 3 columnas de portadas, que es lo que se viene a ver */
+  .library { padding: .9rem .9rem 6.5rem; }   /* hueco para no tapar con el FAB */
+  .view-grid { gap: 1.1rem .7rem; }
+
+  .card-title { font-size: .8rem; }
+  .card-author { font-size: .72rem; }
+  .badge { font-size: .62rem; padding: .1rem .35rem; }
+
+  .view-list .card { padding: .6rem; }
+  .view-list .card-cover { width: 40px; flex-basis: 40px; }
+
+  /* --- fichas a pantalla completa: los modales flotantes se manejan fatal */
+  .dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+  /* En móvil se abre la ficha para puntuar y escribir, así que los campos van
+     primero y la portada con los datos del EPUB se quedan al final. */
+  .dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+    padding: 1.1rem 1rem 1rem;
+    max-height: none;
+    height: calc(100dvh - 68px - env(safe-area-inset-bottom, 0px));
+  }
+  .detail-main { order: 1; }
+  .detail-side { order: 2; }
+
+  /* La portada al lado de sus datos, en rejilla y no en flex: `min-width: 0`
+     es lo que evita que un nombre de fichero largo estire la ficha entera y
+     acabe partiéndose letra a letra. */
+  .detail-side {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: .7rem .9rem;
+    align-items: start;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .detail-cover { width: 92px; grid-row: span 2; }
+  .detail-side > .btn { justify-self: start; }
+  .detail-meta, .detail-side .chips { grid-column: 2; min-width: 0; }
+  .description { max-height: none; }
   .field-row { grid-template-columns: 1fr; }
+  .field input, .field textarea, .field select { padding: .7rem .65rem; font-size: 1rem; }
+  .field-title input { font-size: 1.15rem; }
+  .stars { font-size: 2.1rem; }   /* medias estrellas pulsables con el dedo */
+
+  .dialog-footer {
+    padding: .8rem 1rem calc(.8rem + env(safe-area-inset-bottom, 0px));
+  }
+  .dialog-footer .btn { padding: .75rem 1rem; }
+
+  /* --- avisos que no tapen el FAB */
+  .toasts { left: .75rem; right: .75rem; bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); max-width: none; }
+
+  .gate { padding: 1.5rem 1rem; }
+  .gate-profiles { gap: 1.2rem; margin-bottom: 2rem; }
+
+  .empty { padding: 3rem 1.2rem; }
+}
+
+/* Móviles muy estrechos: tres columnas se quedan ilegibles, mejor dos */
+@media (max-width: 340px) {
+  :root { --cover-w: 130px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -34,14 +34,9 @@
   <div class="topbar-actions">
     <button type="button" class="sync-button" id="sync" hidden></button>
     <button type="button" class="profile-current" id="profile-current" title="Cambiar de perfil"></button>
-    <button type="button" class="btn btn-primary" id="add-books">
-      <span aria-hidden="true">＋</span> Añadir EPUB
-    </button>
     <div class="menu">
       <button type="button" class="btn btn-icon" id="menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Más opciones">⋯</button>
       <div class="menu-panel" id="menu-panel" hidden>
-        <button type="button" data-action="manual">Añadir libro a mano</button>
-        <hr>
         <button type="button" data-action="switch">Cambiar de perfil</button>
         <button type="button" data-action="profiles">Gestionar perfiles</button>
         <hr>
@@ -62,31 +57,65 @@
 <section class="toolbar">
   <div class="search">
     <span class="search-icon" aria-hidden="true">⌕</span>
-    <input type="search" id="search" placeholder="Buscar por título, autor, saga, reseña…" autocomplete="off" aria-label="Buscar">
+    <input type="search" id="search" placeholder="Buscar título, autor, saga…" autocomplete="off" aria-label="Buscar">
   </div>
 
-  <select id="filter-status" aria-label="Filtrar por estado">
-    <option value="">Todos los estados</option>
-  </select>
+  <!-- En móvil los filtros viven en una hoja inferior; en escritorio, en línea -->
+  <button type="button" class="filters-toggle" id="filters-toggle" aria-expanded="false">
+    <span aria-hidden="true">⚙</span> Filtros<span class="filters-count" id="filters-count" hidden></span>
+  </button>
 
-  <select id="filter-rating" aria-label="Filtrar por puntuación">
-    <option value="0">Cualquier nota</option>
-    <option value="5">5 estrellas</option>
-    <option value="4">4+ estrellas</option>
-    <option value="3">3+ estrellas</option>
-  </select>
+  <div class="filters" id="filters">
+    <div class="filters-head">
+      <h2>Filtros y orden</h2>
+      <button type="button" class="btn btn-icon" id="filters-close" aria-label="Cerrar filtros">✕</button>
+    </div>
 
-  <select id="filter-year" aria-label="Filtrar por año de lectura">
-    <option value="">Cualquier año</option>
-  </select>
+    <label class="filter-field">
+      <span>Estado</span>
+      <select id="filter-status" aria-label="Filtrar por estado">
+        <option value="">Todos los estados</option>
+      </select>
+    </label>
 
-  <select id="sort" aria-label="Ordenar por"></select>
+    <label class="filter-field">
+      <span>Puntuación</span>
+      <select id="filter-rating" aria-label="Filtrar por puntuación">
+        <option value="0">Cualquier nota</option>
+        <option value="5">5 estrellas</option>
+        <option value="4">4+ estrellas</option>
+        <option value="3">3+ estrellas</option>
+      </select>
+    </label>
 
-  <div class="view-toggle" role="group" aria-label="Vista">
-    <button type="button" data-view="grid" class="is-active" aria-label="Vista de portadas">▦</button>
-    <button type="button" data-view="list" aria-label="Vista de lista">☰</button>
+    <label class="filter-field">
+      <span>Año de lectura</span>
+      <select id="filter-year" aria-label="Filtrar por año de lectura">
+        <option value="">Cualquier año</option>
+      </select>
+    </label>
+
+    <label class="filter-field">
+      <span>Ordenar por</span>
+      <select id="sort" aria-label="Ordenar por"></select>
+    </label>
+
+    <div class="filter-field">
+      <span>Vista</span>
+      <div class="view-toggle" role="group" aria-label="Vista">
+        <button type="button" data-view="grid" class="is-active" aria-label="Vista de portadas">▦</button>
+        <button type="button" data-view="list" aria-label="Vista de lista">☰</button>
+      </div>
+    </div>
+
+    <div class="filters-foot">
+      <button type="button" class="btn btn-ghost" data-action="clear-filters">Quitar filtros</button>
+      <button type="button" class="btn btn-primary" id="filters-apply">Ver resultados</button>
+    </div>
   </div>
 </section>
+
+<div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
 
 <!-- Pestañas de ámbito: solo aparecen cuando hay más de una biblioteca que ver -->
 <nav class="scopes" id="scopes" aria-label="Qué biblioteca ver" hidden></nav>
@@ -105,6 +134,23 @@
     <span aria-hidden="true">📖</span>
     <p>Suelta aquí tus EPUB</p>
   </div>
+</div>
+
+<!-- Añadir libro: siempre al alcance del pulgar, con las dos vías separadas -->
+<div class="fab" id="fab">
+  <div class="fab-actions" id="fab-actions" hidden>
+    <button type="button" data-action="add-epub">
+      <span class="fab-icon" aria-hidden="true">📕</span>
+      <span><strong>Subir EPUB</strong><small>Saco portada y datos del fichero</small></span>
+    </button>
+    <button type="button" data-action="add-manual">
+      <span class="fab-icon" aria-hidden="true">✏️</span>
+      <span><strong>Añadir a mano</strong><small>Para los que no tienes en EPUB</small></span>
+    </button>
+  </div>
+  <button type="button" class="fab-main" id="fab-main" aria-expanded="false" aria-label="Añadir libro">
+    <span aria-hidden="true">＋</span>
+  </button>
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
