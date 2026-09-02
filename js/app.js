@@ -747,6 +747,10 @@ function wireEvents() {
   wireCoverFallback(el.library);
   wireCoverFallback(el.bookDialog);
 
+  // La ficha alterna entre detalle y edición sin cerrarse, así que el vaciado
+  // va aquí una sola vez y no atado a una apertura concreta.
+  el.bookDialog.addEventListener('close', () => { el.bookDialog.innerHTML = ''; });
+
 
   // --- libros
   el.library.addEventListener('click', (event) => {
@@ -1043,26 +1047,93 @@ async function showStorage() {
 
 /* =========================================================== ficha de libro */
 
+/**
+ * Al tocar un libro se abre su ficha en modo lectura, no el formulario.
+ *
+ * Puntuar es lo que se hace a diario y se resuelve con un toque, así que las
+ * estrellas y el favorito sí son pulsables aquí y guardan al instante. Para
+ * cualquier otra cosa hay que entrar en «Editar» a propósito: abrir siempre el
+ * formulario invitaba a cambiar un campo sin querer.
+ */
 function openBook(book, { isNew = false } = {}) {
   if (!book) return;
   const draft = structuredClone(book);
-  const readOnly = !isNew && draft.profile !== state.profile;
 
+  // Un libro que se añade a mano no tiene nada que mirar: al formulario.
+  if (isNew) return openBookEditor(draft, { isNew: true, readOnly: false });
+
+  openBookDetail(draft, { readOnly: draft.profile !== state.profile });
+}
+
+function openBookDetail(book, { readOnly }) {
+  el.bookDialog.innerHTML = bookDetailHtml(book, readOnly);
+  if (!el.bookDialog.open) el.bookDialog.showModal();
+  paintDialogCover(book);
+
+  const root = el.bookDialog;
+  root.querySelector('[data-role="close"]').addEventListener('click', () => root.close());
+  root.querySelector('[data-role="edit"]')
+    ?.addEventListener('click', () => openBookEditor(book, { isNew: false, readOnly }));
+
+  if (readOnly) return;
+
+  // Estrellas y favorito guardan solos: no hay botón de guardar en el detalle.
+  const starsBox = root.querySelector('.stars');
+  paintStars(starsBox, book.rating);
+  starsBox.addEventListener('click', async (event) => {
+    const value = ratingFromClick(event);
+    if (value === null) return;
+    book.rating = book.rating === value ? 0 : value;   // repetir la nota la quita
+    paintStars(starsBox, book.rating);
+    await saveBook({ ...book });
+  });
+
+  const favButton = root.querySelector('[data-role="favorite"]');
+  paintFavorite(favButton, book.favorite);
+  favButton.addEventListener('click', async () => {
+    book.favorite = !book.favorite;
+    paintFavorite(favButton, book.favorite);
+    await saveBook({ ...book });
+  });
+}
+
+/** Media estrella si se pulsa en la mitad izquierda, entera en la derecha. */
+function ratingFromClick(event) {
+  const button = event.target.closest('button');
+  if (!button) return null;
+  const index = Number(button.dataset.index);
+  const rect = button.getBoundingClientRect();
+  return event.clientX - rect.left < rect.width / 2 ? index - 0.5 : index;
+}
+
+function paintDialogCover(book) {
+  const hueco = el.bookDialog.querySelector('.detail-cover');
+  if (!hueco || !hasAnyCover(book)) return;
+  coverUrl(book.id).then((url) => {
+    const src = url || book.coverPath;
+    if (src && hueco.isConnected) {
+      hueco.insertAdjacentHTML('afterbegin', `<img src="${esc(src)}" alt="">`);
+    }
+  });
+}
+
+/* ------------------------------------------------------- ficha: edición */
+
+function openBookEditor(draft, { isNew = false, readOnly = false } = {}) {
   el.bookDialog.innerHTML = bookDialogHtml(draft, isNew, readOnly);
-  el.bookDialog.showModal();
+  if (!el.bookDialog.open) el.bookDialog.showModal();
 
   const form = el.bookDialog.querySelector('form');
-  form.querySelector('[data-role="cancel"]').addEventListener('click', () => el.bookDialog.close());
-  el.bookDialog.addEventListener('close', () => { el.bookDialog.innerHTML = ''; }, { once: true });
+  // Cancelar en un libro que ya existía devuelve a su detalle, no cierra del
+  // todo: se venía de ahí y cerrar la ficha entera sería perder el sitio.
+  form.querySelector('[data-role="cancel"]').addEventListener('click', () => {
+    if (isNew) el.bookDialog.close();
+    else openBookDetail(draft, { readOnly });
+  });
+
   const coverBox = el.bookDialog.querySelector('.detail-cover');
   let coverBlob = null; // portada nueva elegida a mano, si la hay
-
-  if (hasAnyCover(draft)) {
-    coverUrl(draft.id).then((url) => {
-      const src = url || draft.coverPath;
-      if (src) coverBox.insertAdjacentHTML('afterbegin', `<img src="${esc(src)}" alt="">`);
-    });
-  }
+  paintDialogCover(draft);
 
   // La biblioteca de otra persona se mira, no se toca: cualquier cambio aquí
   // lo sobrescribiría su propietario en la siguiente sincronización.
@@ -1077,11 +1148,8 @@ function openBook(book, { isNew = false } = {}) {
   const starsBox = form.querySelector('.stars');
   paintStars(starsBox, draft.rating);
   starsBox.addEventListener('click', (event) => {
-    const button = event.target.closest('button');
-    if (!button) return;
-    const index = Number(button.dataset.index);
-    const rect = button.getBoundingClientRect();
-    const value = event.clientX - rect.left < rect.width / 2 ? index - 0.5 : index;
+    const value = ratingFromClick(event);
+    if (value === null) return;
     draft.rating = draft.rating === value ? 0 : value; // volver a pulsar quita la nota
     paintStars(starsBox, draft.rating);
   });
@@ -1146,20 +1214,104 @@ function openBook(book, { isNew = false } = {}) {
     }
 
     await saveBook(draft);
-    el.bookDialog.close();
+    // Al guardar se vuelve al detalle para ver el resultado; un libro recién
+    // creado no tenía detalle previo, así que ahí sí se cierra.
+    if (isNew) el.bookDialog.close();
+    else openBookDetail(draft, { readOnly });
   });
 
   form.querySelector('[name="title"]').focus();
 }
 
-function bookDialogHtml(book, isNew, readOnly = false) {
-  const meta = [
+/** Datos de la cabecera del EPUB, comunes al detalle y al formulario. */
+function bookMetaRows(book) {
+  return [
     ['Editorial', book.publisher],
     ['Publicado', book.year],
     ['Idioma', book.language],
     ['ISBN', book.isbn],
     ['Fichero', book.fileName],
   ].filter(([, value]) => value);
+}
+
+function bookDetailHtml(book, readOnly) {
+  const meta = bookMetaRows(book);
+  const status = STATUSES[book.status];
+  const autores = book.authors.length ? book.authors.join(', ') : 'Autor desconocido';
+
+  const fechas = [
+    book.startedAt && `empezado el ${book.startedAt}`,
+    book.finishedAt && `terminado el ${book.finishedAt}`,
+  ].filter(Boolean).join(' · ');
+
+  return `
+  <div class="dialog-body detail-read">
+    ${readOnly ? `<div class="readonly-note" style="grid-column:1/-1">
+      <span aria-hidden="true">👀</span>
+      <span>Estás viendo la biblioteca de <strong>${esc(book.profile)}</strong>. Solo lectura:
+      cualquier cambio lo sobrescribiría su dispositivo al sincronizar.</span>
+    </div>` : ''}
+
+    <div class="detail-side">
+      <div class="detail-cover">${coverMarkup(book)}</div>
+      ${meta.length ? `<div class="detail-meta">${meta
+        .map(([k, v]) => `<div><strong>${esc(k)}:</strong> ${esc(String(v))}</div>`).join('')}</div>` : ''}
+      ${book.subjects?.length ? `<div class="chips">${book.subjects.slice(0, 6)
+        .map((s) => `<span class="chip">${esc(s)}</span>`).join('')}</div>` : ''}
+    </div>
+
+    <div class="detail-main">
+      <div class="dialog-head">
+        <div class="grow">
+          <h2 class="detail-title">${esc(book.title)}</h2>
+          <p class="detail-author">${esc(autores)}</p>
+          ${book.series ? `<p class="detail-series">${esc(book.series)}${
+            book.seriesIndex ? ` · nº ${esc(String(book.seriesIndex))}` : ''}</p>` : ''}
+        </div>
+        <button type="button" class="btn btn-icon" data-role="favorite"
+                aria-pressed="${book.favorite}" title="Marcar como favorito"
+                ${readOnly ? 'disabled' : ''}>${book.favorite ? '★' : '☆'}</button>
+      </div>
+
+      <div class="detail-rating">
+        <div class="stars" role="group" aria-label="Puntuación de 0 a 5">
+          ${[1, 2, 3, 4, 5].map((i) => `
+            <button type="button" data-index="${i}" aria-label="${i} estrellas"
+                    ${readOnly ? 'disabled' : ''}>
+              <span class="star-glyph">★</span>
+            </button>`).join('')}
+        </div>
+        <span class="rating-value"></span>
+      </div>
+
+      <div class="detail-status">
+        <span class="badge" data-status="${esc(book.status)}">${esc(status.icon)} ${esc(status.label)}</span>
+        ${fechas ? `<span class="detail-dates">${esc(fechas)}</span>` : ''}
+      </div>
+
+      <div class="detail-block">
+        <h3>Tu reseña</h3>
+        ${book.review
+          ? `<p class="detail-review">${esc(book.review)}</p>`
+          : `<p class="detail-empty">Todavía no has escrito nada.</p>`}
+      </div>
+
+      ${book.description ? `<div class="detail-block">
+        <h3>Sinopsis</h3>
+        <div class="description">${esc(book.description)}</div>
+      </div>` : ''}
+    </div>
+  </div>
+
+  <div class="dialog-footer">
+    <span class="spacer"></span>
+    <button type="button" class="btn" data-role="close">Cerrar</button>
+    ${readOnly ? '' : '<button type="button" class="btn btn-primary" data-role="edit">Editar</button>'}
+  </div>`;
+}
+
+function bookDialogHtml(book, isNew, readOnly = false) {
+  const meta = bookMetaRows(book);
 
   return `
   <form method="dialog">

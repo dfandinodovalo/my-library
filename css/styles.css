@@ -868,6 +868,50 @@ button, input, select, textarea {
 
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 
+/* ------------------------------------------------------ ficha: solo lectura */
+
+.detail-title { font-size: 1.3rem; line-height: 1.25; }
+.detail-author { margin: var(--space-1) 0 0; color: var(--text-dim); }
+.detail-series { margin: var(--space-1) 0 0; font-size: .85rem; color: var(--text-faint); }
+
+.detail-rating { display: flex; align-items: center; gap: var(--space-3); }
+
+.detail-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+/* Aquí el badge va sobre el fondo del diálogo, no sobre una portada: mismo
+   tratamiento que en la vista de lista. */
+.detail-status .badge {
+  background: color-mix(in srgb, var(--color-estado) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-estado) 35%, transparent);
+  color: var(--color-estado);
+  backdrop-filter: none;
+  font-size: .78rem;
+}
+.detail-status .badge[data-status="reading"]   { --color-estado: var(--coral); }
+.detail-status .badge[data-status="pending"]   { --color-estado: var(--star); }
+.detail-status .badge[data-status="read"]      { --color-estado: var(--accent-strong); }
+.detail-status .badge[data-status="abandoned"] { --color-estado: var(--text-faint); }
+
+.detail-dates { font-size: .82rem; color: var(--text-faint); }
+
+.detail-block h3 {
+  font-size: .78rem;
+  color: var(--text-faint);
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+.detail-review {
+  margin: 0;
+  line-height: 1.6;
+  font-size: .92rem;
+  white-space: pre-wrap;   /* respeta los saltos de línea que escribió quien la puso */
+}
+.detail-empty { margin: 0; font-size: .9rem; color: var(--text-faint); font-style: italic; }
+
 /* --------------------------------------------------------------- estrellas */
 
 .stars {
