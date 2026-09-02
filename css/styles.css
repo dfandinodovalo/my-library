@@ -184,7 +184,7 @@ button, input, select, textarea {
 }
 
 .brand { display: flex; align-items: center; gap: var(--space-2); }
-.brand-mark { font-size: 1.4rem; }
+.brand-mark { width: 30px; height: 30px; display: block; }
 .brand h1 { font-family: var(--font); font-size: 1.25rem; letter-spacing: .2px; }
 
 .topbar-actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
@@ -626,6 +626,52 @@ button, input, select, textarea {
 /* La columna lateral (nota + fecha) solo tiene sentido en la vista de lista */
 .view-grid .card-side { display: none; }
 
+/* --------------------------------------------------- agrupado por estado */
+
+.view-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+  font-size: 1rem;
+  color: var(--text);
+}
+
+/* Cada cabecera lleva el color de su estado, el mismo de las píldoras, para
+   que se reconozca el grupo de un vistazo sin leer el rótulo. */
+.group-head { --color-estado: var(--text-dim); }
+.group-head[data-status="reading"]   { --color-estado: var(--coral); }
+.group-head[data-status="pending"]   { --color-estado: var(--star); }
+.group-head[data-status="read"]      { --color-estado: var(--accent-strong); }
+.group-head[data-status="abandoned"] { --color-estado: var(--text-faint); }
+
+.group-icon { color: var(--color-estado); font-size: .9em; }
+.group-title { font-weight: 500; }
+
+.group-count {
+  margin-left: auto;
+  padding: 0 var(--space-2);
+  min-width: 1.5rem;
+  text-align: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-estado) 15%, transparent);
+  color: var(--color-estado);
+  font-size: .8rem;
+  font-weight: 500;
+}
+
+/* Sin position:sticky a propósito. Anclar la cabecera bajo la barra superior
+   exige conocer su altura, que cambia con el área segura del móvil y con la
+   media query, y no compensa: los grupos son cortos y se leen de un vistazo. */
+
 /* ------------------------------------------------------------------ lista */
 
 .view-list { display: flex; flex-direction: column; gap: var(--space-1); }
@@ -1022,7 +1068,7 @@ button, input, select, textarea {
     padding: calc(var(--space-2) + var(--safe-top)) var(--gutter) var(--space-2);
   }
   .brand h1 { display: none; }
-  .brand-mark { font-size: 1.5rem; }
+  .brand-mark { width: 32px; height: 32px; }
   .profile-current { padding: var(--space-1); border-color: transparent; background: transparent; }
   .profile-current .profile-current-name { display: none; }
   .profile-current .avatar { width: 34px; font-size: .9rem; }

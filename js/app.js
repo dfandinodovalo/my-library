@@ -7,7 +7,7 @@
 
 import * as db from './db.js';
 import {
-  STATUSES, SORTS, emptyBook, importEpubs, applyFilters, readYears,
+  STATUSES, GROUP_ORDER, SORTS, emptyBook, importEpubs, applyFilters, readYears,
   computeStats, exportBackup, importBackup,
 } from './library.js';
 import { zipSupported } from './zip.js';
@@ -515,7 +515,9 @@ function renderLibrary() {
   const books = applyFilters(state.books, state.filters);
 
   el.library.className = `library view-${state.view}`;
-  el.library.innerHTML = books.map(cardHtml).join('');
+  el.library.innerHTML = state.view === 'groups'
+    ? groupsHtml(books)
+    : books.map(cardHtml).join('');
   observeCovers();
 
   const hasFilters = Boolean(state.filters.search || state.filters.status
@@ -531,6 +533,34 @@ function renderLibrary() {
          saco el título, el autor y la portada— o para añadir un libro a mano.</p>
          <button type="button" class="btn btn-primary" data-action="add">Subir un EPUB</button>`;
   }
+}
+
+/**
+ * Vista por estado: una sección por cada uno, en el orden de GROUP_ORDER.
+ *
+ * Los grupos vacíos no se pintan. Si estás filtrando por "Leído", ver cuatro
+ * cabeceras con tres a cero solo sería ruido; y con la biblioteca recién
+ * empezada la pantalla se llenaría de secciones huecas.
+ *
+ * Dentro de cada grupo se reutiliza la rejilla de portadas tal cual: las reglas
+ * de .view-grid cuelgan de un ancestro, así que basta con ponerle la clase.
+ */
+function groupsHtml(books) {
+  return GROUP_ORDER.map((estado) => {
+    const grupo = books.filter((book) => book.status === estado);
+    if (!grupo.length) return '';
+
+    const { plural, icon } = STATUSES[estado];
+    return `
+      <section class="group">
+        <h2 class="group-head" data-status="${esc(estado)}">
+          <span class="group-icon" aria-hidden="true">${esc(icon)}</span>
+          <span class="group-title">${esc(plural)}</span>
+          <span class="group-count">${grupo.length}</span>
+        </h2>
+        <div class="group-items view-grid">${grupo.map(cardHtml).join('')}</div>
+      </section>`;
+  }).join('');
 }
 
 function cardHtml(book) {
@@ -716,6 +746,7 @@ function wireEvents() {
 
   wireCoverFallback(el.library);
   wireCoverFallback(el.bookDialog);
+
 
   // --- libros
   el.library.addEventListener('click', (event) => {

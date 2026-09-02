@@ -7,11 +7,17 @@ import { parseEpub } from './epub.js';
 import * as db from './db.js';
 
 export const STATUSES = {
-  read: { label: 'Leído', icon: '✓' },
-  reading: { label: 'Leyendo', icon: '▶' },
-  pending: { label: 'Pendiente', icon: '◷' },
-  abandoned: { label: 'Abandonado', icon: '✕' },
+  read: { label: 'Leído', plural: 'Leídos', icon: '✓' },
+  reading: { label: 'Leyendo', plural: 'Leyendo ahora', icon: '▶' },
+  pending: { label: 'Pendiente', plural: 'Pendientes', icon: '◷' },
+  abandoned: { label: 'Abandonado', plural: 'Abandonados', icon: '✕' },
 };
+
+/**
+ * Orden de los grupos en la vista por estado: primero lo que se está leyendo,
+ * que es lo que se consulta a diario, y al final lo abandonado.
+ */
+export const GROUP_ORDER = ['reading', 'read', 'pending', 'abandoned'];
 
 export function newId() {
   return (crypto.randomUUID?.() ?? `b-${Date.now()}-${Math.random().toString(36).slice(2)}`);
