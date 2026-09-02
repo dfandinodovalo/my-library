@@ -1159,20 +1159,13 @@ button, input, select, textarea {
   }
   .menu-head h2 { font-family: var(--font); font-size: 1.1rem; font-weight: 500; }
 
-  /* --- estadísticas: una tira que se desliza, no cinco tarjetas gigantes */
-  .stats {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    /* Sin scroll-snap: alineaba el primer elemento con el inicio del
-       scrollport ignorando el padding, y desplazaba la tira 16px comiéndose
-       el margen izquierdo de la página. En métricas no aporta nada. */
-    gap: var(--space-2);
-    scrollbar-width: none;
-  }
-  .stats::-webkit-scrollbar { display: none; }
+  /* --- estadísticas: se reparten el ancho, igual que en escritorio.
+     Antes eran una tira deslizable porque había cinco y no cabían; con tres
+     entran de sobra y deslizar para ver un número era absurdo. */
+  .stats { gap: var(--space-2); }
   .stat {
-    flex: 0 0 auto;
-    min-width: 92px;
+    flex: 1 1 0;      /* partes iguales, sin base que las desiguale */
+    min-width: 0;     /* deja que se encojan por debajo de su contenido */
     padding: var(--space-2) var(--space-3);
   }
   .stat-value { font-size: 1.15rem; }
