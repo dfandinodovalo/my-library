@@ -489,8 +489,6 @@ function renderStats() {
   const cards = [
     ['En la estantería', stats.total],
     ['Leídos', stats.read],
-    [`Leídos en ${new Date().getFullYear()}`, stats.thisYear],
-    ['Leyendo ahora', stats.reading],
     ['Nota media', stats.average ? stats.average.toFixed(1) : '—'],
   ];
   el.stats.innerHTML = cards.map(([label, value]) => `

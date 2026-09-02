@@ -194,19 +194,18 @@ export function readYears(books) {
 
 /* ------------------------------------------------------------ estadisticas */
 
+/**
+ * Solo lo que se enseña. Los recuentos por estado se quitaron de la cabecera
+ * porque ya los da la vista agrupada, y mantenerlos aquí solo sería calcular
+ * cifras que nadie mira.
+ */
 export function computeStats(books) {
-  const read = books.filter((book) => book.status === 'read');
   const rated = books.filter((book) => book.rating > 0);
-  const thisYear = new Date().getFullYear();
 
   return {
     total: books.length,
-    read: read.length,
-    reading: books.filter((book) => book.status === 'reading').length,
-    pending: books.filter((book) => book.status === 'pending').length,
-    thisYear: read.filter((book) => readYear(book) === thisYear).length,
+    read: books.filter((book) => book.status === 'read').length,
     average: rated.length ? rated.reduce((sum, book) => sum + book.rating, 0) / rated.length : 0,
-    favorites: books.filter((book) => book.favorite).length,
   };
 }
 
