@@ -7,8 +7,8 @@
 
 import * as db from './db.js';
 import {
-  STATUSES, GROUP_ORDER, SORTS, emptyBook, importEpubs, applyFilters, readYears,
-  computeStats, exportBackup, importBackup,
+  STATUSES, GROUP_ORDER, SORTS, emptyBook, readEpubs, commitBooks, applyFilters,
+  readYears, computeStats, exportBackup, importBackup,
 } from './library.js';
 import { zipSupported } from './zip.js';
 import * as sync from './sync.js';
@@ -966,38 +966,44 @@ async function handleFiles(files) {
   state.scope = state.profile;
 
   const notice = progressToast(epubs.length);
-  const result = await importEpubs(epubs, state.profile, mine, (done, total, name) => {
-    notice.update(done, total, name);
-  });
+  // Leer no guarda nada: los libros salen de aquí en memoria, y a la biblioteca
+  // solo entran cuando se confirman.
+  const { ready, skipped, failed } = await readEpubs(epubs, state.profile, mine,
+    (done, total, name) => notice.update(done, total, name));
   notice.close();
 
-  await loadBooks();
-
-  if (result.added.length) {
-    markDirty();
-    protegerDatos();   // ya hay libros que merece la pena no perder
+  // Lo que no se ha llegado a preparar sí se cuenta ya: son avisos, no cambios.
+  if (skipped.length) {
+    toast(`${skipped.length} ya estaba${skipped.length > 1 ? 'n' : ''} en la estantería.`);
   }
-
-  const parts = [];
-  if (result.added.length) parts.push(`${result.added.length} libro${result.added.length > 1 ? 's' : ''} añadido${result.added.length > 1 ? 's' : ''}`);
-  if (result.skipped.length) parts.push(`${result.skipped.length} ya estaba${result.skipped.length > 1 ? 'n' : ''} en la estantería`);
-  if (parts.length) toast(parts.join(' · '));
-
-  for (const failure of result.failed) {
+  for (const failure of failed) {
     toast(`No pude leer «${failure.name}»: ${failure.message}`, { error: true });
   }
+  if (!ready.length) return;
 
-  // Con un solo libro se abre directamente el formulario: acabas de añadirlo y
-  // lo que toca es completar estado, fechas y nota, no leer su ficha. Si se
-  // cancela, el libro se descarta: la importación ya lo guardó para poder
-  // sacarle la portada, pero eso es un paso interno, no una decisión tuya.
-  if (result.added.length === 1) {
-    const recien = state.books.find((b) => b.id === result.added[0].id);
-    if (recien) {
-      openBookEditor(structuredClone(recien),
-        { isNew: false, readOnly: false, discardOnCancel: true });
-    }
+  // Con un solo libro se abre el formulario para revisarlo antes de añadirlo.
+  // Cancelar no deja rastro porque todavía no se ha escrito nada.
+  if (ready.length === 1) {
+    const { book, cover } = ready[0];
+    openBookEditor(book, {
+      isNew: true,
+      pendingCover: cover,
+      onSaved: () => confirmarAlta(1),
+    });
+    return;
   }
+
+  // Con varios no hay revisión posible una a una: se añaden y listo.
+  await commitBooks(ready);
+  await loadBooks();
+  confirmarAlta(ready.length);
+}
+
+/** Cierra el alta de libros: avisa, marca para publicar y protege los datos. */
+function confirmarAlta(cuantos) {
+  markDirty();
+  protegerDatos();   // ya hay libros que merece la pena no perder
+  toast(`${cuantos} libro${cuantos > 1 ? 's' : ''} añadido${cuantos > 1 ? 's' : ''}.`);
 }
 
 async function handleBackupFile(file) {
@@ -1127,39 +1133,37 @@ function paintDialogCover(book) {
 /* ------------------------------------------------------- ficha: edición */
 
 /**
- * `discardOnCancel` es para el libro recién importado de un EPUB: la
- * importación ya lo ha guardado en IndexedDB antes de abrir este formulario
- * —hace falta para extraer portada y metadatos—, así que cancelar tiene que
- * deshacerlo de verdad y no limitarse a cerrar la ventana.
+ * `pendingCover` es la portada de un libro que todavía no existe en la base de
+ * datos: viene de un EPUB recién leído y se guarda solo si se confirma el alta.
+ * `onSaved` avisa a quien abrió el formulario de que el libro ya es real.
  */
-function openBookEditor(draft, { isNew = false, readOnly = false, discardOnCancel = false } = {}) {
+function openBookEditor(draft, { isNew = false, readOnly = false,
+                                 pendingCover = null, onSaved = null } = {}) {
   el.bookDialog.innerHTML = bookDialogHtml(draft, isNew, readOnly);
   if (!el.bookDialog.open) el.bookDialog.showModal();
 
   const form = el.bookDialog.querySelector('form');
-  let guardado = false;
-
-  /** Deshace la importación. Cubre también cerrar con Esc, no solo el botón. */
-  const descartar = async () => {
-    if (!discardOnCancel || guardado) return;
-    await db.deleteBook(draft.id);
-    releaseCover(draft.id);
-    state.books = state.books.filter((b) => b.id !== draft.id);
-    render();
-    toast(`«${draft.title}» descartado, no se ha añadido.`);
-  };
-  el.bookDialog.addEventListener('close', descartar, { once: true });
 
   // Cancelar en un libro que ya existía devuelve a su detalle, no cierra del
-  // todo: se venía de ahí y cerrar la ficha entera sería perder el sitio.
+  // todo: se venía de ahí y cerrar la ficha entera sería perder el sitio. En
+  // uno nuevo simplemente se cierra, y como no se ha escrito nada, no hay nada
+  // que deshacer.
   form.querySelector('[data-role="cancel"]').addEventListener('click', () => {
-    if (isNew || discardOnCancel) el.bookDialog.close();   // el close dispara descartar()
+    if (isNew) el.bookDialog.close();
     else openBookDetail(draft, { readOnly });
   });
 
   const coverBox = el.bookDialog.querySelector('.detail-cover');
-  let coverBlob = null; // portada nueva elegida a mano, si la hay
-  paintDialogCover(draft);
+  let coverBlob = pendingCover;   // se escribe en el submit, no antes
+
+  if (pendingCover) {
+    // Aún no está en IndexedDB, así que se pinta directamente del blob.
+    coverBox.querySelector('.cover-fallback')?.remove();
+    coverBox.insertAdjacentHTML('afterbegin',
+      `<img src="${URL.createObjectURL(pendingCover)}" alt="">`);
+  } else {
+    paintDialogCover(draft);
+  }
 
   // La biblioteca de otra persona se mira, no se toca: cualquier cambio aquí
   // lo sobrescribiría su propietario en la siguiente sincronización.
@@ -1239,8 +1243,8 @@ function openBookEditor(draft, { isNew = false, readOnly = false, discardOnCance
       draft.hasCover = true;
     }
 
-    guardado = true;   // a partir de aquí, cerrar ya no descarta nada
     await saveBook(draft);
+    onSaved?.(draft);
     // Al guardar se vuelve al detalle para ver el resultado; un libro recién
     // creado no tenía detalle previo, así que ahí sí se cierra.
     if (isNew) el.bookDialog.close();

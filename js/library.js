@@ -62,13 +62,21 @@ export function emptyBook(profile) {
 /* -------------------------------------------------------------- importacion */
 
 /**
- * Importa una lista de ficheros EPUB al perfil indicado.
+ * Lee una lista de EPUB y prepara los libros SIN tocar la base de datos.
+ *
+ * Leer y guardar son dos cosas distintas a propósito: mientras no se confirme,
+ * un libro importado vive solo en memoria. Así cancelar no deja rastro, en vez
+ * de tener que deshacer una escritura que nunca se pidió.
+ *
+ * Devuelve `ready` con pares { book, cover }: la portada viaja aparte porque es
+ * un Blob y no debe acabar dentro del registro del libro.
+ *
  * `onProgress(done, total, label)` se llama tras cada fichero para que la UI
  * pueda ir informando; los fallos no abortan el lote, se acumulan y se devuelven.
  */
-export async function importEpubs(files, profile, existingBooks, onProgress) {
+export async function readEpubs(files, profile, existingBooks, onProgress) {
   const seen = new Set(existingBooks.map(fingerprint));
-  const added = [];
+  const ready = [];
   const skipped = [];
   const failed = [];
 
@@ -94,17 +102,16 @@ export async function importEpubs(files, profile, existingBooks, onProgress) {
         characters: meta.characters || null,
         pages: meta.pages,
         pagesSource: meta.pagesSource,
-        hasCover: Boolean(meta.cover),
       };
 
       const key = fingerprint(book);
       if (seen.has(key)) {
         skipped.push(book.title);
       } else {
+        // Cuenta también contra los de este mismo lote: dos ficheros distintos
+        // del mismo libro no deben entrar los dos.
         seen.add(key);
-        if (meta.cover) await db.putCover(book.id, meta.cover);
-        await db.putBook(book);
-        added.push(book);
+        ready.push({ book, cover: meta.cover || null });
       }
     } catch (error) {
       failed.push({ name: file.name, message: error.message });
@@ -112,7 +119,21 @@ export async function importEpubs(files, profile, existingBooks, onProgress) {
     onProgress?.(++done, files.length, file.name);
   }
 
-  return { added, skipped, failed };
+  return { ready, skipped, failed };
+}
+
+/** Confirma en la base de datos los libros preparados por readEpubs(). */
+export async function commitBooks(ready) {
+  const saved = [];
+  for (const { book, cover } of ready) {
+    if (cover) {
+      await db.putCover(book.id, cover);
+      book.hasCover = true;
+    }
+    await db.putBook(book);
+    saved.push(book);
+  }
+  return saved;
 }
 
 /**
