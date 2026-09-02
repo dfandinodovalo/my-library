@@ -11,7 +11,7 @@
  * tener proceso de compilación que genere el hash automáticamente.
  */
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL_CACHE = `biblioteca-shell-${VERSION}`;
 // Las portadas sobreviven a los cambios de versión: su nombre es el id del
 // libro y no cambian nunca, así que volver a bajarlas sería tirar datos.
@@ -117,7 +117,7 @@ self.addEventListener('fetch', (event) => {
   if (ruta.includes('/data/') && ruta.endsWith('.json')) return;
 
   if (ruta.includes('/data/covers/')) {
-    event.respondWith(portada(request));
+    event.respondWith(portada(event));
   } else {
     event.respondWith(shell(request));
   }
@@ -127,19 +127,39 @@ self.addEventListener('fetch', (event) => {
  * Portadas: se sirven al instante de la caché y se refrescan por detrás. Pesan
  * y su nombre es el id del libro, así que rara vez cambian; pero si alguien
  * sustituye una, la siguiente visita ya la tendrá.
+ *
+ * El refresco va dentro de event.waitUntil() y no suelto: en cuanto se devuelve
+ * la copia guardada, el navegador da por terminado el trabajo del service
+ * worker y puede pararlo, abortando cualquier petición que siguiera en vuelo.
+ * Eso aparecía en la pestaña de red como un reguero de net::ERR_FAILED y, lo
+ * que es peor, dejaba portadas a medio guardar.
  */
-async function portada(request) {
+async function portada(event) {
+  const { request } = event;
   const cache = await caches.open(COVERS_CACHE);
   const guardada = await cache.match(request);
 
-  const red = fetch(request)
-    .then((respuesta) => {
-      if (respuesta.ok) cache.put(request, respuesta.clone());
-      return respuesta;
-    })
-    .catch(() => null);
+  if (guardada) {
+    event.waitUntil(refrescar(cache, request));
+    return guardada;
+  }
 
-  return guardada || (await red) || new Response('', { status: 504 });
+  try {
+    const respuesta = await fetch(request);
+    if (respuesta.ok) event.waitUntil(cache.put(request, respuesta.clone()));
+    return respuesta;
+  } catch {
+    // Sin red y sin copia guardada: la interfaz ya enseña el diseño de
+    // repuesto con el título, así que basta con no reventar.
+    return new Response('', { status: 504, statusText: 'Sin conexión' });
+  }
+}
+
+async function refrescar(cache, request) {
+  try {
+    const respuesta = await fetch(request);
+    if (respuesta.ok) await cache.put(request, respuesta);
+  } catch { /* ya se sirvió la copia guardada; el refresco es opcional */ }
 }
 
 /** Shell: de la caché, que para eso se precargó; si no está, a la red. */

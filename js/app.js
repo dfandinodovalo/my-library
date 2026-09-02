@@ -575,6 +575,27 @@ function coverMarkup(book) {
   return fallbackCover(book);
 }
 
+/**
+ * Si una portada publicada no llega (sin conexión, o el fichero ya no está),
+ * se cae al diseño de repuesto con el título. Sin esto quedaba un recuadro
+ * vacío y el libro se volvía irreconocible.
+ *
+ * El evento `error` de una imagen no burbujea, así que hay que escucharlo en
+ * fase de captura; a cambio, un único listener cubre toda la rejilla.
+ */
+function wireCoverFallback(contenedor) {
+  contenedor.addEventListener('error', (event) => {
+    const img = event.target;
+    if (img.tagName !== 'IMG') return;
+    const hueco = img.closest('.card-cover, .detail-cover');
+    const id = hueco?.dataset.cover ?? img.closest('[data-id]')?.dataset.id;
+    const book = state.books.find((b) => b.id === id);
+    if (!hueco || !book) return;
+    img.remove();
+    hueco.insertAdjacentHTML('afterbegin', fallbackCover(book));
+  }, true);
+}
+
 function fallbackCover(book) {
   return `<div class="cover-fallback">
     <div class="cf-title">${esc(book.title)}</div>
@@ -692,6 +713,9 @@ function wireEvents() {
   });
 
   el.syncButton.addEventListener('click', () => doSync());
+
+  wireCoverFallback(el.library);
+  wireCoverFallback(el.bookDialog);
 
   // --- libros
   el.library.addEventListener('click', (event) => {
