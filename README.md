@@ -158,8 +158,14 @@ js/sync.js      Publicar la propia biblioteca y traer las demás
 js/app.js       Interfaz
 sw.js           Service worker: abre sin conexión
 manifest.webmanifest  Metadatos para instalarla como app
+icons/          Logo (icon.svg) y los PNG derivados
+tools/          generar-iconos.sh, solo si cambia el logo
 data/           Lo publicado: un JSON por persona + portadas
 ```
+
+Los iconos se generan del SVG con `./tools/generar-iconos.sh`, que usa Chrome en
+modo headless como rasterizador para no arrastrar dependencias. Solo hay que
+volver a lanzarlo si cambia `icons/icon.svg`.
 
 ## Compatibilidad
 

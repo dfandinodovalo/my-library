@@ -26,6 +26,11 @@ const SHELL = [
   './index.html',
   './manifest.webmanifest',
   './css/styles.css',
+  // Solo los dos iconos que carga la propia página: los maskable y el de iOS
+  // los usa el sistema operativo, no el documento, y meterlos aquí solo daría
+  // más ocasiones de que fallara la instalación.
+  './icons/icon.svg',
+  './icons/icon-192.png',
   './js/app.js',
   './js/library.js',
   './js/db.js',
