@@ -1,15 +1,15 @@
 {
   "name": "Mi biblioteca",
   "short_name": "Biblioteca",
-  "description": "Catálogo personal de libros leídos, con portadas extraídas de los EPUB.",
+  "description": "Tu estante, en el bolsillo. Sube tus EPUB, organiza y reseña.",
   "lang": "es",
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "id": "./",
   "display": "standalone",
-  "theme_color": "#0d1714",
-  "background_color": "#0d1714",
+  "theme_color": "#123a33",
+  "background_color": "#123a33",
   "categories": ["books", "productivity"],
   "icons": [
     {

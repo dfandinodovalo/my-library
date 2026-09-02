@@ -167,6 +167,28 @@ Los iconos se generan del SVG con `./tools/generar-iconos.sh`, que usa Chrome en
 modo headless como rasterizador para no arrastrar dependencias. Solo hay que
 volver a lanzarlo si cambia `icons/icon.svg`.
 
+## Marca
+
+Sigue la guía gráfica. Los colores no son decorativos: cada uno tiene un cometido
+y no se usa fuera de él.
+
+| Color | | Para qué |
+|---|---|---|
+| Tinta | `#123A33` | Fondos y texto |
+| Coral | `#D85A30` | Acción (el botón de añadir) y estado *leyendo* |
+| Ámbar | `#EF9F27` | Reseñas y puntuaciones, y estado *pendiente* |
+| Verde | `#0F6E56` | Confirmar (guardar) y estado *leído* |
+| Crema | `#F5EFE3` | Fondo de la app en tema claro |
+
+Tipografía: SF Pro, con Inter como alternativa y la del sistema como respaldo.
+No se carga ninguna webfont, así que se resuelve con la pila del sistema.
+Títulos a peso 500, cuerpo a 400, y **siempre en frase, nunca en Mayúsculas
+Iniciales ni versalitas**.
+
+Los cinco colores están en `css/styles.css` como `--tinta`, `--coral`, `--ambar`,
+`--verde` y `--crema`; el resto de variables derivan de ellos, así que un cambio
+de marca se hace en un solo sitio.
+
 ## Compatibilidad
 
 Necesita `DecompressionStream`: Chrome 103+, Firefox 113+, Safari 16.4+. Si el

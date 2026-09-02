@@ -1,33 +1,46 @@
 /* =========================================================================
    Mi biblioteca — hoja de estilos unica
-   Verde de libreria, sobrio. El tema oscuro es el de por defecto porque las
-   portadas destacan mucho mas sobre fondo oscuro.
+   Sigue la guia grafica de la marca. El tema oscuro es el de por defecto
+   porque las portadas destacan mucho mas sobre fondo tinta.
    ========================================================================= */
 
-/* --- Color -----------------------------------------------------------------
-   Verde librería, sobrio y poco saturado. El acento no compite con las
-   portadas: son ellas las que deben llevar el color de la página.          */
+/* --- Marca -----------------------------------------------------------------
+   Colores de la guía gráfica. Cada uno tiene un cometido asignado y no se usa
+   fuera de él: coral es acción, verde es confirmación, ámbar es reseña.       */
+:root {
+  --tinta:  #123a33;
+  --coral:  #d85a30;
+  --ambar:  #ef9f27;
+  --verde:  #0f6e56;
+  --crema:  #f5efe3;
+}
 
 :root {
-  --bg: #0d1714;
-  --bg-elev: #14211d;
-  --bg-elev-2: #1e2f29;
-  --border: #2a3d36;
-  --text: #e9eeeb;
-  --text-dim: #9db0a7;
-  --text-faint: #6d8078;
-  --accent: #4a9e7f;
-  --accent-strong: #67b998;
-  --accent-ink: #06110e;
-  --danger: #c9705f;
-  --star: #c9a961;          /* dorado apagado; el amarillo puro chirría aquí */
+  --bg: var(--tinta);
+  --bg-elev: #17453d;
+  --bg-elev-2: #1f5449;
+  --border: #2c6153;
+  --text: var(--crema);
+  --text-dim: #a7c2b8;
+  --text-faint: #7b998e;
+  --accent: var(--verde);
+  /* Sobre fondo tinta el verde de marca casi no se despega, así que para
+     TEXTO se usa una versión aclarada. En fondos (botones) se usa el de marca. */
+  --accent-strong: #45a98a;
+  --accent-ink: var(--crema);
+  --action: var(--coral);       /* la acción principal: añadir un libro */
+  --action-ink: var(--crema);
+  --danger: #d8683f;
+  --star: var(--ambar);         /* la guía asigna el ámbar a las reseñas */
 
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 10px 30px rgb(0 0 0 / 45%);
   --cover-w: 168px;
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --serif: ui-serif, Georgia, "Iowan Old Style", "Times New Roman", serif;
+  /* SF Pro en iOS y macOS, Inter si está instalada, y la del sistema en el
+     resto. Sin webfonts: el proyecto no carga nada de un CDN. */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          Inter, system-ui, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
   /* --- Espaciado ---------------------------------------------------------
      Una escala única. Antes cada sección inventaba su padding (9.6, 11.2,
@@ -72,19 +85,21 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f4f2ec;
-  --bg-elev: #fbfaf6;
-  --bg-elev-2: #e9e8e0;
-  --border: #d7d5cb;
-  --text: #16241f;
-  --text-dim: #4e5f58;
-  --text-faint: #7c8a83;
-  --accent: #00594f;        /* el verde profundo de librería */
-  --accent-strong: #00423a;
-  --accent-ink: #fbfaf6;
-  --danger: #a34a38;
-  --star: #9c7c2c;
-  --shadow: 0 10px 28px rgb(20 50 40 / 12%);
+  --bg: var(--crema);
+  --bg-elev: #fdfaf3;
+  --bg-elev-2: #ebe4d5;
+  --border: #ddd4c2;
+  --text: var(--tinta);
+  --text-dim: #4a655c;
+  --text-faint: #7a8f86;
+  --accent: var(--verde);
+  --accent-strong: #0b5443;
+  --accent-ink: var(--crema);
+  --action: var(--coral);
+  --action-ink: var(--crema);
+  --danger: #b8471f;
+  --star: #c07f10;          /* el ámbar puro no contrasta sobre crema */
+  --shadow: 0 10px 28px rgb(18 58 51 / 12%);
 }
 
 * { box-sizing: border-box; }
@@ -102,12 +117,12 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   /* Textura muy sutil de papel para que el fondo no sea un plano muerto */
-  background-image: radial-gradient(circle at 12% -5%, rgb(74 158 127 / 10%), transparent 42%),
-                    radial-gradient(circle at 88% 8%, rgb(74 158 127 / 6%), transparent 38%);
+  background-image: radial-gradient(circle at 12% -5%, rgb(15 110 86 / 22%), transparent 42%),
+                    radial-gradient(circle at 88% 8%, rgb(216 90 48 / 7%), transparent 38%);
   background-attachment: fixed;
 }
 
-h1, h2, h3 { margin: 0; font-weight: 600; }
+h1, h2, h3 { margin: 0; font-weight: 500; }   /* la guía fija 500 en títulos */
 
 button, input, select, textarea {
   font: inherit;
@@ -170,7 +185,7 @@ button, input, select, textarea {
 
 .brand { display: flex; align-items: center; gap: var(--space-2); }
 .brand-mark { font-size: 1.4rem; }
-.brand h1 { font-family: var(--serif); font-size: 1.25rem; letter-spacing: .2px; }
+.brand h1 { font-family: var(--font); font-size: 1.25rem; letter-spacing: .2px; }
 
 .topbar-actions { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
 
@@ -302,7 +317,8 @@ button, input, select, textarea {
 .gate-inner { text-align: center; max-width: 900px; }
 
 .gate-title {
-  font-family: var(--serif);
+  font-family: var(--font);
+  font-weight: 500;
   font-size: clamp(1.6rem, 5vw, 2.6rem);
   font-weight: 500;
   margin-bottom: var(--space-6);
@@ -399,7 +415,8 @@ button, input, select, textarea {
 }
 .stat-value {
   display: block;
-  font-family: var(--serif);
+  font-family: var(--font);
+  font-weight: 500;
   font-size: 1.6rem;
   line-height: 1.1;
   color: var(--accent-strong);
@@ -408,8 +425,6 @@ button, input, select, textarea {
   display: block;
   margin-top: var(--space-1);
   font-size: .75rem;
-  text-transform: uppercase;
-  letter-spacing: .07em;
   color: var(--text-faint);
 }
 
@@ -536,7 +551,8 @@ button, input, select, textarea {
   border: 1px solid var(--border);
 }
 .cover-fallback .cf-title {
-  font-family: var(--serif);
+  font-family: var(--font);
+  font-weight: 500;
   font-size: .95rem;
   line-height: 1.25;
   display: -webkit-box;
@@ -559,18 +575,26 @@ button, input, select, textarea {
   justify-content: space-between;
   pointer-events: none;
 }
+/* Cada estado con el color que le asigna la guía: coral leyendo, ámbar
+   pendiente, verde leído. Abandonado no está en la guía, así que se queda
+   apagado a propósito: no compite con los tres que sí importan. */
 .badge {
+  --color-estado: var(--text-dim);
   padding: var(--space-1) var(--space-2);
   border-radius: 999px;
   font-size: .7rem;
-  font-weight: 600;
-  /* Al 62% las portadas claras (naranjas, blancas) traspasaban y el texto
-     blanco se volvia ilegible. */
+  font-weight: 500;
+  /* Sobre la portada hace falta el velo oscuro para leer el texto: al 62% las
+     portadas claras traspasaban. El color del estado va en la tinta. */
   background: rgb(0 0 0 / 78%);
-  color: #fff;
+  color: var(--color-estado);
   backdrop-filter: blur(6px);
 }
-.badge-fav { background: rgb(0 0 0 / 62%); color: var(--star); }
+.badge[data-status="reading"]   { --color-estado: #f0805a; }  /* coral aclarado para leerse sobre negro */
+.badge[data-status="pending"]   { --color-estado: var(--ambar); }
+.badge[data-status="read"]      { --color-estado: #4fbd99; }  /* verde aclarado, ídem */
+.badge[data-status="abandoned"] { --color-estado: #c9b8ae; }
+.badge-fav { background: rgb(0 0 0 / 62%); color: var(--ambar); }
 
 .card-rating {
   position: absolute;
@@ -634,26 +658,18 @@ button, input, select, textarea {
   order: 4;
 }
 /* Aquí el badge va sobre el fondo de la app, no sobre una portada: el velo
-   negro que necesita en la rejilla aquí sería una mancha. */
+   negro que necesita en la rejilla aquí sería una mancha. Se tiñe la píldora
+   entera con el color del estado, en vez de solo el texto. */
 .view-list .badge {
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  color: var(--text-dim);
+  background: color-mix(in srgb, var(--color-estado) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-estado) 35%, transparent);
+  color: var(--color-estado);
   backdrop-filter: none;
-  font-weight: 500;
 }
-.view-list .badge[data-status="read"] {
-  color: var(--accent-strong);
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-}
-.view-list .badge[data-status="reading"] {
-  color: var(--star);
-  border-color: color-mix(in srgb, var(--star) 45%, transparent);
-}
-.view-list .badge[data-status="abandoned"] {
-  color: var(--danger);
-  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
-}
+.view-list .badge[data-status="reading"]   { --color-estado: var(--coral); }
+.view-list .badge[data-status="pending"]   { --color-estado: var(--star); }
+.view-list .badge[data-status="read"]      { --color-estado: var(--accent-strong); }
+.view-list .badge[data-status="abandoned"] { --color-estado: var(--text-faint); }
 .view-list .badge-fav { color: var(--star); border-color: transparent; background: transparent; }
 .view-list .card-main { flex: 1; min-width: 0; order: 2; }
 .view-list .card-title { -webkit-line-clamp: 1; line-clamp: 1; }
@@ -675,7 +691,7 @@ button, input, select, textarea {
   text-align: center;
   color: var(--text-dim);
 }
-.empty h2 { font-family: var(--serif); font-size: 1.3rem; margin-bottom: var(--space-2); color: var(--text); }
+.empty h2 { font-family: var(--font); font-size: 1.3rem; margin-bottom: var(--space-2); color: var(--text); }
 .empty p { margin: 0 auto var(--space-4); max-width: 40ch; line-height: 1.6; }
 
 /* -------------------------------------------------------------- dropzone */
@@ -783,8 +799,6 @@ button, input, select, textarea {
 .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .field > label {
   font-size: .74rem;
-  text-transform: uppercase;
-  letter-spacing: .07em;
   color: var(--text-faint);
 }
 .field input, .field textarea, .field select {
@@ -796,7 +810,8 @@ button, input, select, textarea {
 }
 .field textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
 .field-title input {
-  font-family: var(--serif);
+  font-family: var(--font);
+  font-weight: 500;
   font-size: 1.25rem;
   padding: var(--space-1) var(--space-2);
   background: transparent;
@@ -889,7 +904,7 @@ button, input, select, textarea {
 .dialog-profiles .dialog-body,
 .dialog-sync .dialog-body { grid-template-columns: 1fr; gap: var(--space-4); }
 
-.dialog-sync h2 { font-family: var(--serif); font-weight: 500; }
+.dialog-sync h2 { font-family: var(--font); font-weight: 500; }
 .dialog-sync .detail-meta { font-size: .85rem; line-height: 1.6; }
 
 .sync-help {
@@ -933,15 +948,17 @@ button, input, select, textarea {
   height: 56px;
   border: 0;
   border-radius: 50%;
-  background: var(--accent);
-  color: var(--accent-ink);
+  /* Coral, no verde: la guia reserva el coral para la accion y el verde para
+     confirmar. Anadir un libro es LA accion de esta app. */
+  background: var(--action);
+  color: var(--action-ink);
   font-size: 1.9rem;
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 6px 20px rgb(0 0 0 / 35%);
   transition: transform .2s ease, background .15s;
 }
-.fab-main:hover { background: var(--accent-strong); }
+.fab-main:hover { background: color-mix(in srgb, var(--action) 85%, black); }
 .fab-main[aria-expanded="true"] { transform: rotate(45deg); }
 
 .fab-actions {
@@ -1041,7 +1058,7 @@ button, input, select, textarea {
     padding: var(--space-2) 0 var(--space-2);
     background: var(--bg-elev);
   }
-  .menu-head h2 { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; }
+  .menu-head h2 { font-family: var(--font); font-size: 1.1rem; font-weight: 500; }
 
   /* --- estadísticas: una tira que se desliza, no cinco tarjetas gigantes */
   .stats {
@@ -1136,7 +1153,7 @@ button, input, select, textarea {
     padding: var(--space-2) 0 var(--space-3);
     background: var(--bg-elev);
   }
-  .filters-head h2 { font-family: var(--serif); font-size: 1.1rem; font-weight: 500; }
+  .filters-head h2 { font-family: var(--font); font-size: 1.1rem; font-weight: 500; }
 
   .filter-field {
     display: flex;
@@ -1147,8 +1164,6 @@ button, input, select, textarea {
   .filter-field > span {
     display: block;
     font-size: .74rem;
-    text-transform: uppercase;
-    letter-spacing: .07em;
     color: var(--text-faint);
   }
   .filters select { width: 100%; padding: var(--space-3) var(--space-3); font-size: 1rem; }
