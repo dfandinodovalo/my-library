@@ -988,10 +988,15 @@ async function handleFiles(files) {
   }
 
   // Con un solo libro se abre directamente el formulario: acabas de añadirlo y
-  // lo que toca es completar estado, fechas y nota, no leer su ficha.
+  // lo que toca es completar estado, fechas y nota, no leer su ficha. Si se
+  // cancela, el libro se descarta: la importación ya lo guardó para poder
+  // sacarle la portada, pero eso es un paso interno, no una decisión tuya.
   if (result.added.length === 1) {
     const recien = state.books.find((b) => b.id === result.added[0].id);
-    if (recien) openBookEditor(structuredClone(recien), { isNew: false, readOnly: false });
+    if (recien) {
+      openBookEditor(structuredClone(recien),
+        { isNew: false, readOnly: false, discardOnCancel: true });
+    }
   }
 }
 
@@ -1121,15 +1126,34 @@ function paintDialogCover(book) {
 
 /* ------------------------------------------------------- ficha: edición */
 
-function openBookEditor(draft, { isNew = false, readOnly = false } = {}) {
+/**
+ * `discardOnCancel` es para el libro recién importado de un EPUB: la
+ * importación ya lo ha guardado en IndexedDB antes de abrir este formulario
+ * —hace falta para extraer portada y metadatos—, así que cancelar tiene que
+ * deshacerlo de verdad y no limitarse a cerrar la ventana.
+ */
+function openBookEditor(draft, { isNew = false, readOnly = false, discardOnCancel = false } = {}) {
   el.bookDialog.innerHTML = bookDialogHtml(draft, isNew, readOnly);
   if (!el.bookDialog.open) el.bookDialog.showModal();
 
   const form = el.bookDialog.querySelector('form');
+  let guardado = false;
+
+  /** Deshace la importación. Cubre también cerrar con Esc, no solo el botón. */
+  const descartar = async () => {
+    if (!discardOnCancel || guardado) return;
+    await db.deleteBook(draft.id);
+    releaseCover(draft.id);
+    state.books = state.books.filter((b) => b.id !== draft.id);
+    render();
+    toast(`«${draft.title}» descartado, no se ha añadido.`);
+  };
+  el.bookDialog.addEventListener('close', descartar, { once: true });
+
   // Cancelar en un libro que ya existía devuelve a su detalle, no cierra del
   // todo: se venía de ahí y cerrar la ficha entera sería perder el sitio.
   form.querySelector('[data-role="cancel"]').addEventListener('click', () => {
-    if (isNew) el.bookDialog.close();
+    if (isNew || discardOnCancel) el.bookDialog.close();   // el close dispara descartar()
     else openBookDetail(draft, { readOnly });
   });
 
@@ -1215,6 +1239,7 @@ function openBookEditor(draft, { isNew = false, readOnly = false } = {}) {
       draft.hasCover = true;
     }
 
+    guardado = true;   // a partir de aquí, cerrar ya no descarta nada
     await saveBook(draft);
     // Al guardar se vuelve al detalle para ver el resultado; un libro recién
     // creado no tenía detalle previo, así que ahí sí se cierra.
