@@ -41,7 +41,10 @@ export function emptyBook(profile) {
     fileName: '',
     fileSize: 0,
     hasCover: false,
-    status: 'read',
+    // Pendiente, no leído: subir el EPUB solo dice que tienes el libro, no que
+    // te lo hayas terminado. Darlo por leído obligaría a corregir a mano cada
+    // importación, y falsearía las estadísticas mientras no lo hicieras.
+    status: 'pending',
     rating: 0,
     review: '',
     startedAt: '',

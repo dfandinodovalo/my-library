@@ -11,7 +11,7 @@
  * tener proceso de compilación que genere el hash automáticamente.
  */
 
-const VERSION = 'v7';
+const VERSION = 'v8';
 const SHELL_CACHE = `biblioteca-shell-${VERSION}`;
 // Las portadas sobreviven a los cambios de versión: su nombre es el id del
 // libro y no cambian nunca, así que volver a bajarlas sería tirar datos.
