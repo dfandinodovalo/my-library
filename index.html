@@ -6,8 +6,22 @@
   <title>Mi biblioteca</title>
   <meta name="description" content="Catálogo personal de libros leídos, con portadas extraídas de los EPUB.">
   <meta name="color-scheme" content="dark light">
-  <meta name="theme-color" content="#16130f">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+  <!-- Un color por esquema: pinta la barra de estado del móvil a juego con la
+       app en vez de dejar un corte de color al abrirla instalada. -->
+  <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0d1714" media="(prefers-color-scheme: dark)">
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <!-- iOS respeta el manifest desde la 16.4, pero estas dos siguen haciendo
+       falta para que en versiones anteriores abra sin barra de navegador. -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Biblioteca">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>

@@ -114,6 +114,39 @@ async function init() {
 
   // En segundo plano: la web ya es usable mientras llega lo publicado.
   initialSync();
+  registrarServiceWorker();
+}
+
+/**
+ * Registra el service worker que permite abrir la app sin conexión.
+ *
+ * `updateViaCache: 'none'` es importante: GitHub Pages sirve todo con
+ * max-age=600, y sin esto el navegador podría darle al service worker una copia
+ * guardada de sí mismo y retrasar diez minutos cada actualización.
+ *
+ * Va al final del arranque y sin await a propósito: si falla, o si el navegador
+ * no lo soporta, la app funciona igual. Es una mejora, no un requisito.
+ */
+function registrarServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker
+    .register('./sw.js', { scope: './', updateViaCache: 'none' })
+    .catch((error) => console.warn('No se pudo registrar el service worker', error));
+}
+
+/**
+ * Pide almacenamiento persistente, pero solo una vez y solo cuando ya hay algo
+ * que perder: pedirlo nada más entrar, sin un libro guardado todavía, es un
+ * aviso de permiso gratuito que además se concede peor.
+ */
+async function protegerDatos() {
+  if (await db.getSetting('persistenceRequested', false)) return;
+  await db.setSetting('persistenceRequested', true);
+
+  const concedido = await db.requestPersistence();
+  if (concedido) {
+    toast('Tus libros quedan protegidos: el navegador ya no los borrará por su cuenta.');
+  }
 }
 
 function buildSelects() {
@@ -881,7 +914,10 @@ async function handleFiles(files) {
 
   await loadBooks();
 
-  if (result.added.length) markDirty();
+  if (result.added.length) {
+    markDirty();
+    protegerDatos();   // ya hay libros que merece la pena no perder
+  }
 
   const parts = [];
   if (result.added.length) parts.push(`${result.added.length} libro${result.added.length > 1 ? 's' : ''} añadido${result.added.length > 1 ? 's' : ''}`);

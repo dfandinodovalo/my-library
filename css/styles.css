@@ -51,6 +51,24 @@
      botón contiguos difieren en 2-3px según su font-size y no llegan a
      alinearse por mucho que cuadre el padding. */
   --control-h: 2.4rem;
+
+  /* Espacio que hay que dejar arriba para no quedar debajo de la barra de
+     estado del móvil. En el navegador no hace falta: la barra del navegador
+     ya ocupa ese sitio. */
+  --safe-top: 0px;
+}
+
+/* Instalada en la pantalla de inicio, la app se dibuja de borde a borde y el
+   reloj y la batería quedan ENCIMA de la cabecera.
+   Se usa max() y no env() a secas porque varios Android devuelven 0 en
+   safe-area-inset-top aun dibujando bajo la barra de estado, y entonces la
+   cabecera desaparece del todo. El mínimo de 1.75rem cubre ese caso; donde
+   env() sí funciona (iPhone con isla dinámica reporta ~59px), gana env(). */
+@media all and (display-mode: standalone) {
+  :root { --safe-top: max(env(safe-area-inset-top, 0px), 1.75rem); }
+}
+@media all and (display-mode: fullscreen) {
+  :root { --safe-top: max(env(safe-area-inset-top, 0px), 1.75rem); }
 }
 
 :root[data-theme="light"] {
@@ -144,7 +162,7 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-3) var(--gutter);
+  padding: calc(var(--space-3) + var(--safe-top)) var(--gutter) var(--space-3);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
@@ -979,7 +997,13 @@ button, input, select, textarea {
   }
 
   /* --- cabecera compacta: el título ocupa espacio que necesitan los libros */
-  .topbar { gap: var(--space-2); padding: var(--space-2) var(--gutter); }
+  /* Ojo: esta regla pisa el padding de la cabecera, asi que tiene que
+     repetir --safe-top. Sin el, instalada en el movil la barra de estado
+     se comia la cabecera entera. */
+  .topbar {
+    gap: var(--space-2);
+    padding: calc(var(--space-2) + var(--safe-top)) var(--gutter) var(--space-2);
+  }
   .brand h1 { display: none; }
   .brand-mark { font-size: 1.5rem; }
   .profile-current { padding: var(--space-1); border-color: transparent; background: transparent; }
@@ -1181,7 +1205,9 @@ button, input, select, textarea {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
-    padding: var(--space-4) var(--space-4) var(--space-4);
+    /* Igual que la cabecera: a pantalla completa, el título del libro caería
+       debajo del reloj si no se reserva la franja de la barra de estado. */
+    padding: calc(var(--space-4) + var(--safe-top)) var(--space-4) var(--space-4);
     max-height: none;
     height: calc(100dvh - 68px - env(safe-area-inset-bottom, 0px));
   }
@@ -1216,7 +1242,7 @@ button, input, select, textarea {
   /* --- avisos que no tapen el FAB */
   .toasts { left: .75rem; right: .75rem; bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); max-width: none; }
 
-  .gate { padding: var(--space-5) var(--space-4); }
+  .gate { padding: calc(var(--space-5) + var(--safe-top)) var(--space-4) var(--space-5); }
   .gate-profiles { gap: var(--space-4); margin-bottom: var(--space-6); }
 
   .empty { padding: var(--space-7) var(--space-4); }

@@ -90,6 +90,38 @@ En un minuto está en `https://<tu-usuario>.github.io/my-library/`.
 No hace falta workflow de Actions ni `.nojekyll`: no hay build ni carpetas que
 empiecen por guión bajo.
 
+## Instalarla como app
+
+Al abrirla en el móvil puedes añadirla a la pantalla de inicio y se comporta como
+una app: icono propio, sin barra de navegador y **abre sin conexión**.
+
+- **iPhone (Safari)**: Compartir → *Añadir a pantalla de inicio*.
+- **Android (Chrome)**: menú del navegador → *Instalar aplicación*.
+
+En iOS esto no es un capricho estético: Safari **borra el almacenamiento de una web
+tras 7 días sin visitarla**, y ahí es donde viven tus libros. Instalada en la pantalla
+de inicio queda exenta de ese borrado. Si usas la app en el móvil, instálala.
+
+La app pide además almacenamiento persistente por su cuenta después de que añadas
+tu primer libro. Puedes comprobar el estado en `⋯ → Espacio usado`.
+
+### Al publicar una versión nueva
+
+`sw.js` guarda una copia de la app para poder abrirla sin conexión, y esa copia se
+identifica por una constante:
+
+```js
+const VERSION = 'v1';
+```
+
+**Si tocas `index.html`, el CSS o cualquier módulo de `js/`, sube ese número** (`v2`,
+`v3`…) antes de hacer push. Si no lo haces, los dispositivos que ya tengan la app
+seguirán sirviendo la copia guardada y no verán tus cambios. No hay proceso de
+compilación que lo automatice, así que toca acordarse.
+
+Los ficheros de `data/` no se cachean nunca, así que publicar libros desde la app
+no requiere tocar nada de esto.
+
 ## Desarrollo local
 
 Los módulos ES no funcionan abriendo `index.html` con doble clic (`file://` los
@@ -124,8 +156,16 @@ js/config.js    Dónde está el repo que hace de almacén
 js/github.js    Cliente de la API de GitHub (commits atómicos)
 js/sync.js      Publicar la propia biblioteca y traer las demás
 js/app.js       Interfaz
+sw.js           Service worker: abre sin conexión
+manifest.webmanifest  Metadatos para instalarla como app
+icons/          Logo (icon.svg) y los PNG derivados
+tools/          generar-iconos.sh, solo si cambia el logo
 data/           Lo publicado: un JSON por persona + portadas
 ```
+
+Los iconos se generan del SVG con `./tools/generar-iconos.sh`, que usa Chrome en
+modo headless como rasterizador para no arrastrar dependencias. Solo hay que
+volver a lanzarlo si cambia `icons/icon.svg`.
 
 ## Compatibilidad
 
