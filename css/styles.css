@@ -144,7 +144,11 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  padding: var(--space-3) var(--gutter);
+  /* El inset superior es para cuando corre instalada en iOS: con
+     apple-mobile-web-app-status-bar-style=black-translucent el contenido pasa
+     por debajo de la barra de estado, y sin esto el reloj caería encima del
+     título. En navegador el inset vale 0 y no cambia nada. */
+  padding: calc(var(--space-3) + env(safe-area-inset-top, 0px)) var(--gutter) var(--space-3);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);

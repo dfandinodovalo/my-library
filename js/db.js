@@ -135,3 +135,23 @@ export async function storageEstimate() {
   const { usage, quota } = await navigator.storage.estimate();
   return { usage, quota };
 }
+
+/**
+ * Pide al navegador que no borre estos datos por su cuenta.
+ *
+ * Por defecto IndexedDB es descartable: el navegador puede vaciarla si va justo
+ * de disco y, en el caso de Safari, la borra sin más tras 7 dias sin visitar la
+ * web. Como aquí vive la biblioteca entera, merece la pena pedir el ascenso.
+ *
+ * Devuelve true si los datos quedan protegidos. Chrome lo concede en silencio
+ * si usas la web con cierta frecuencia o la tienes instalada; Firefox pregunta.
+ */
+export async function requestPersistence() {
+  if (!navigator.storage?.persist) return false;
+  if (await navigator.storage.persisted()) return true;
+  try {
+    return await navigator.storage.persist();
+  } catch {
+    return false;
+  }
+}
