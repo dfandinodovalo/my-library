@@ -107,10 +107,19 @@ export async function push({ profiles } = {}) {
   const existing = await gh.listPaths();
   const files = [];
 
-  // 1. Portadas que faltan en el repo. Se suben una vez y ya se quedan.
+  // 1. Portadas que deben seguir existiendo en el repo.
+  //
+  // Cuentan las dos procedencias, y esto es lo importante: un libro que llegó
+  // por sincronización NO tiene el blob en este dispositivo, solo el coverPath
+  // de la copia ya publicada. Si únicamente se miraran los blobs locales, al
+  // publicar desde un móvil que recibió la biblioteca en vez de importar los
+  // EPUB, esta lista saldría vacía y el paso 2 borraría del repo TODAS las
+  // portadas. Pasó, y dejó la biblioteca entera sin imágenes.
   const wanted = new Set();
   for (const book of books) {
+    if (book.coverPath) wanted.add(book.coverPath);   // ya publicada: se respeta
     if (!book.hasCover) continue;
+
     const blob = await db.getCover(book.id);
     if (!blob) continue;
     const path = paths.cover(book.id, blob.type);
@@ -120,9 +129,15 @@ export async function push({ profiles } = {}) {
   }
 
   // 2. Portadas de libros ya borrados: se quitan para no dejar basura.
-  for (const path of existing) {
-    if (path.startsWith(`${paths.coversDir}/`) && !wanted.has(path)) {
-      files.push({ path, delete: true });
+  //
+  // Nunca se borra a ciegas: si no hay ni una sola portada que conservar es que
+  // algo va mal (biblioteca aún sin cargar, fallo al leer IndexedDB...), y más
+  // vale dejar ficheros de sobra en el repo que cargarse los de todos.
+  if (wanted.size > 0) {
+    for (const path of existing) {
+      if (path.startsWith(`${paths.coversDir}/`) && !wanted.has(path)) {
+        files.push({ path, delete: true });
+      }
     }
   }
 
