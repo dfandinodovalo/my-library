@@ -987,9 +987,11 @@ async function handleFiles(files) {
     toast(`No pude leer «${failure.name}»: ${failure.message}`, { error: true });
   }
 
-  // Con un solo libro, abrir la ficha invita a puntuarlo en el momento.
+  // Con un solo libro se abre directamente el formulario: acabas de añadirlo y
+  // lo que toca es completar estado, fechas y nota, no leer su ficha.
   if (result.added.length === 1) {
-    openBook(state.books.find((b) => b.id === result.added[0].id));
+    const recien = state.books.find((b) => b.id === result.added[0].id);
+    if (recien) openBookEditor(structuredClone(recien), { isNew: false, readOnly: false });
   }
 }
 
@@ -1234,8 +1236,34 @@ function bookMetaRows(book) {
   ].filter(([, value]) => value);
 }
 
+/**
+ * Longitud del libro en texto legible.
+ *
+ * Se marca cuándo es una estimación: un EPUB no tiene páginas —el texto se
+ * reflowa— así que salvo que el fichero traiga el mapa de la edición impresa,
+ * la cifra sale de dividir las palabras contadas. Darla por exacta sería
+ * mentir, y con "≈" queda claro de un vistazo.
+ */
+function bookLength(book) {
+  if (!book.words && !book.pages) return null;
+
+  const partes = [];
+  if (book.pages) {
+    partes.push(book.pagesSource === 'epub'
+      ? `${book.pages} páginas`
+      : `≈ ${book.pages} páginas`);
+  }
+  if (book.words) partes.push(`${book.words.toLocaleString('es-ES')} palabras`);
+
+  return {
+    texto: partes.join(' · '),
+    estimado: book.pagesSource === 'estimado',
+  };
+}
+
 function bookDetailHtml(book, readOnly) {
   const meta = bookMetaRows(book);
+  const largo = bookLength(book);
   const status = STATUSES[book.status];
   const autores = book.authors.length ? book.authors.join(', ') : 'Autor desconocido';
 
@@ -1288,6 +1316,12 @@ function bookDetailHtml(book, readOnly) {
         <span class="badge" data-status="${esc(book.status)}">${esc(status.icon)} ${esc(status.label)}</span>
         ${fechas ? `<span class="detail-dates">${esc(fechas)}</span>` : ''}
       </div>
+
+      ${largo ? `<p class="detail-length"${largo.estimado
+        ? ' title="El EPUB no trae paginación: es una estimación a partir de las palabras del libro"'
+        : ' title="Paginación declarada por el propio EPUB"'}>
+        <span aria-hidden="true">📖</span> ${esc(largo.texto)}
+      </p>` : ''}
 
       <div class="detail-block">
         <h3>Tu reseña</h3>

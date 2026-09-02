@@ -29,8 +29,88 @@ export async function parseEpub(file) {
   const metadata = readMetadata(opf);
   const manifest = readManifest(opf, opfDir);
   const cover = await extractCover(zip, opf, manifest, opfDir);
+  const length = await measureLength(zip, opf, manifest);
 
-  return { ...metadata, cover, fileName: file.name, fileSize: file.size };
+  return { ...metadata, ...length, cover, fileName: file.name, fileSize: file.size };
+}
+
+/* ----------------------------------------------------------------- longitud */
+
+/** Palabras por página en una novela impresa. Es la cifra editorial habitual. */
+const WORDS_PER_PAGE = 250;
+
+/**
+ * Mide cuánto tiene el libro.
+ *
+ * Un EPUB no tiene páginas: el texto se reflowa según la pantalla y el cuerpo
+ * de letra, así que el número de páginas no existe en el fichero. Lo que sí se
+ * puede es contar las palabras reales y estimar a partir de ellas.
+ *
+ * Con una excepción: algunos EPUB traen un `page-list`, el mapa a la paginación
+ * de la edición en papel. Cuando está, ese número es el de verdad y manda sobre
+ * la estimación. Se distingue con `pagesSource` para no dar por exacto algo que
+ * es un cálculo.
+ */
+async function measureLength(zip, opf, manifest) {
+  const spine = tags(opf, 'itemref')
+    .map((ref) => manifest.get(ref.getAttribute('idref')))
+    .filter((item) => item && /x?html/.test(item.type) && zip.has(item.path));
+
+  let words = 0;
+  let characters = 0;
+  for (const item of spine) {
+    try {
+      const texto = plainText(await zip.text(item.path));
+      if (!texto) continue;
+      characters += texto.length;
+      words += texto.split(' ').length;
+    } catch {
+      // Un capítulo ilegible no debe tumbar la importación entera.
+    }
+  }
+
+  const declared = await declaredPages(zip, manifest);
+  return {
+    words,
+    characters,
+    pages: declared ?? (words ? Math.max(1, Math.round(words / WORDS_PER_PAGE)) : null),
+    pagesSource: declared ? 'epub' : (words ? 'estimado' : null),
+  };
+}
+
+/**
+ * Texto plano a base de expresiones regulares y no con DOMParser: hay que
+ * recorrer decenas de capítulos y construir un documento por cada uno cuesta
+ * bastante más. Para contar palabras no hace falta tanta precisión.
+ */
+function plainText(html) {
+  return html
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&(?:[a-z]+|#\d+);/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Última página del `page-list` del nav, si el EPUB lo trae. */
+async function declaredPages(zip, manifest) {
+  const nav = Array.from(manifest.values())
+    .find((item) => item.properties.split(/\s+/).includes('nav'));
+  if (!nav || !zip.has(nav.path)) return null;
+
+  try {
+    const doc = parseXml(await zip.text(nav.path), 'text/html');
+    const lista = Array.from(doc.querySelectorAll('nav')).find((n) =>
+      /page-list/.test(n.getAttribute('epub:type') || n.getAttribute('type') || ''));
+    if (!lista) return null;
+
+    const numeros = Array.from(lista.querySelectorAll('a'))
+      .map((a) => parseInt(a.textContent.trim(), 10))
+      .filter(Number.isFinite);
+    return numeros.length ? Math.max(...numeros) : null;
+  } catch {
+    return null;
+  }
 }
 
 /* ---------------------------------------------------------------- metadatos */

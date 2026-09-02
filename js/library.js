@@ -40,6 +40,10 @@ export function emptyBook(profile) {
     year: null,
     fileName: '',
     fileSize: 0,
+    words: null,          // palabras contadas del EPUB
+    characters: null,
+    pages: null,          // de la edición impresa si el EPUB la declara, o estimadas
+    pagesSource: null,    // 'epub' | 'estimado' | null
     hasCover: false,
     // Pendiente, no leído: subir el EPUB solo dice que tienes el libro, no que
     // te lo hayas terminado. Darlo por leído obligaría a corregir a mano cada
@@ -86,6 +90,10 @@ export async function importEpubs(files, profile, existingBooks, onProgress) {
         year: meta.year,
         fileName: meta.fileName,
         fileSize: meta.fileSize,
+        words: meta.words || null,
+        characters: meta.characters || null,
+        pages: meta.pages,
+        pagesSource: meta.pagesSource,
         hasCover: Boolean(meta.cover),
       };
 
