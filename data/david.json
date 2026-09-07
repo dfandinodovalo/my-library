@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-02T12:43:44.613Z",
+  "updatedAt": "2026-09-07T12:09:40.310Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -23,14 +23,14 @@
       "year": 1986,
       "fileName": "Misery_Stephen_King.epub",
       "fileSize": 994956,
-      "status": "reading",
-      "rating": 0,
+      "status": "read",
+      "rating": 3,
       "review": "",
       "startedAt": "2026-08-27",
-      "finishedAt": "",
+      "finishedAt": "2026-09-07",
       "favorite": false,
       "addedAt": "2026-08-31T11:32:33.652Z",
-      "updatedAt": "2026-08-31T17:41:38.597Z",
+      "updatedAt": "2026-09-07T11:58:46.033Z",
       "coverPath": "data/covers/064f662e-7e97-4f3b-8020-8aba0c2f4b5e.jpg"
     },
     {
@@ -53,14 +53,14 @@
       "year": 2024,
       "fileName": "El_extranjero_Albert_Camus.epub",
       "fileSize": 477606,
-      "status": "pending",
+      "status": "reading",
       "rating": 0,
       "review": "",
-      "startedAt": "",
+      "startedAt": "2026-09-07",
       "finishedAt": "",
       "favorite": false,
       "addedAt": "2026-09-02T09:36:12.481Z",
-      "updatedAt": "2026-09-02T09:36:26.688Z",
+      "updatedAt": "2026-09-07T12:04:25.670Z",
       "coverPath": "data/covers/5662e19f-4c00-48d6-a91a-e818c4217751.jpg"
     },
     {
