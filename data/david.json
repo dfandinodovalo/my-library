@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-07T12:09:40.310Z",
+  "updatedAt": "2026-09-07T12:16:21.412Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -62,6 +62,39 @@
       "addedAt": "2026-09-02T09:36:12.481Z",
       "updatedAt": "2026-09-07T12:04:25.670Z",
       "coverPath": "data/covers/5662e19f-4c00-48d6-a91a-e818c4217751.jpg"
+    },
+    {
+      "id": "59274255-3eae-4c13-94ad-5ec209d72412",
+      "title": "La verdad sobre el caso Harry Quebert",
+      "authors": [
+        "Joël Dicker"
+      ],
+      "series": "Marcus Goldman Goiko",
+      "seriesIndex": 1,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Quién mató a Nola Kellergan es la gran incógnita a desvelar en este thriller incomparable cuya experiencia de lectura escapa a cualquier tentativa de descripción. Intentémoslo: una gran novela policiaca y romántica a tres tiempos −1975, 1998 y 2008− acerca del asesinato de una joven de quince años en la pequeña ciudad de Aurora, en New Hampshire. En 2008, Marcus Goldman, un joven escritor, visita a su mentor −Harry Quebert, autor de una aclamada novela−, y descubre que éste tuvo una relación secreta con Nola Kellergan. Poco después, Harry es arrestado, acusado de asesinato, al encontrarse el cadáver de Nola enterrado en su jardín. Marcus comienza a investigar y a escribir un libro sobre el caso. Mientras intenta demostrar la inocencia de Harry, una trama de secretos sale a la luz. La verdad sólo llega al final de un largo, intrincado y apasionante recorrido. Premio Goncourt des Lycéens, Gran Premio de Novela de la Academia Francesa y Premio Lire a la mejor novela en lengua francesa.",
+      "subjects": [
+        "Novela",
+        "Policial"
+      ],
+      "isbn": "",
+      "year": 2012,
+      "fileName": "La_verdad_sobre_el_caso_Harry_Quebert_Joel_Dicker.epub",
+      "fileSize": 718239,
+      "words": 182816,
+      "characters": 1047957,
+      "pages": 731,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-07T12:15:57.595Z",
+      "updatedAt": "2026-09-07T12:16:14.115Z",
+      "coverPath": "data/covers/59274255-3eae-4c13-94ad-5ec209d72412.jpg"
     },
     {
       "id": "5b219557-f6be-4d9c-b3a0-01d52022e1f3",
