@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-07T12:16:21.412Z",
+  "updatedAt": "2026-09-09T06:28:32.807Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -53,14 +53,14 @@
       "year": 2024,
       "fileName": "El_extranjero_Albert_Camus.epub",
       "fileSize": 477606,
-      "status": "reading",
-      "rating": 0,
+      "status": "read",
+      "rating": 3.5,
       "review": "",
       "startedAt": "2026-09-07",
-      "finishedAt": "",
+      "finishedAt": "2026-09-08",
       "favorite": false,
       "addedAt": "2026-09-02T09:36:12.481Z",
-      "updatedAt": "2026-09-07T12:04:25.670Z",
+      "updatedAt": "2026-09-08T21:31:38.048Z",
       "coverPath": "data/covers/5662e19f-4c00-48d6-a91a-e818c4217751.jpg"
     },
     {
@@ -86,14 +86,14 @@
       "characters": 1047957,
       "pages": 731,
       "pagesSource": "estimado",
-      "status": "pending",
+      "status": "reading",
       "rating": 0,
       "review": "",
-      "startedAt": "",
+      "startedAt": "2026-09-09",
       "finishedAt": "",
       "favorite": false,
       "addedAt": "2026-09-07T12:15:57.595Z",
-      "updatedAt": "2026-09-07T12:16:14.115Z",
+      "updatedAt": "2026-09-08T21:41:58.067Z",
       "coverPath": "data/covers/59274255-3eae-4c13-94ad-5ec209d72412.jpg"
     },
     {
