@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-09T06:28:32.807Z",
+  "updatedAt": "2026-09-21T23:06:57.744Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -32,6 +32,39 @@
       "addedAt": "2026-08-31T11:32:33.652Z",
       "updatedAt": "2026-09-07T11:58:46.033Z",
       "coverPath": "data/covers/064f662e-7e97-4f3b-8020-8aba0c2f4b5e.jpg"
+    },
+    {
+      "id": "156feee1-70dc-479d-9172-ac92452565eb",
+      "title": "Proyecto Hail Mary",
+      "authors": [
+        "Andy Weir"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es-ES",
+      "description": "La novela que ha inspirado la película Proyecto Salvación, protagonizada por Ryan Gosling. Más de 5 millones de lectores. Un único astronauta. Una misión imposible. Un aliado que jamás habría imaginado. Ryland Grace es el único superviviente en una misión desesperada. Es la última oportunidad y, si fracasa, la humanidad y la Tierra misma perecerán. Claro que, de momento, él no lo sabe. Ni siquiera puede recordar su propio nombre, y mucho menos la naturaleza de su misión o cómo llevarla a cabo. Lo único que sabe es que ha estado en coma inducido durante mucho mucho tiempo. Acaba de despertar y se encuentra a millones de kilómetros de su hogar, sin más compañía que la de dos cadáveres. Muertos sus compañeros de tripulación, y a medida que va recuperando confusamente los recuerdos, Grace se da cuenta de que se enfrenta a una misión imposible. Recorriendo el espacio en una pequeña nave, depende de él acabar con una amenaza de extinción para nuestra especie. Sin apenas tiempo y con el ser humano más cercano a años luz de distancia, habrá de conseguirlo estando completamente solo. ¿O no? Proyecto Hail Mary, una aventura interestelar irresistible como solo Andy Weir podía imaginar, es una historia de descubrimiento, especulación y supervivencia a la altura de El marciano, que nos lleva a lugares que nunca soñamos alcanzar.",
+      "subjects": [
+        "Novela",
+        "Ciencia ficción"
+      ],
+      "isbn": "",
+      "year": 2021,
+      "fileName": "Proyecto_Hail_Mary_Andy_Weir.epub",
+      "fileSize": 4102056,
+      "words": 154609,
+      "characters": 899033,
+      "pages": 618,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-21T23:05:23.111Z",
+      "updatedAt": "2026-09-21T23:05:27.707Z",
+      "coverPath": "data/covers/156feee1-70dc-479d-9172-ac92452565eb.jpg"
     },
     {
       "id": "5662e19f-4c00-48d6-a91a-e818c4217751",
@@ -88,12 +121,12 @@
       "pagesSource": "estimado",
       "status": "reading",
       "rating": 0,
-      "review": "",
+      "review": "[12-09-26]\nLlevo 4 capítulos, se me hacen largos pero la trama está interesante. Voy leyendo un capitulo al día, a ver si consigo coger más ritmo.",
       "startedAt": "2026-09-09",
       "finishedAt": "",
       "favorite": false,
       "addedAt": "2026-09-07T12:15:57.595Z",
-      "updatedAt": "2026-09-08T21:41:58.067Z",
+      "updatedAt": "2026-09-12T11:22:48.193Z",
       "coverPath": "data/covers/59274255-3eae-4c13-94ad-5ec209d72412.jpg"
     },
     {
@@ -153,6 +186,39 @@
       "addedAt": "2026-08-31T15:09:47.325Z",
       "updatedAt": "2026-08-31T15:12:17.913Z",
       "coverPath": "data/covers/7a8416e4-cb8a-4d68-be9e-591dc5fffdb5.jpg"
+    },
+    {
+      "id": "945af565-dceb-413a-bbf5-62bf007db68a",
+      "title": "Materia oscura",
+      "authors": [
+        "Blake Crouch"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Cualquier decisión se ramifica en un nuevo mundo. Jason Dessen vive en Chicago, donde ha renunciado a sus grandes aspiraciones científicas para dar clases y centrarse en su familia. Una noche, tras asistir a la celebración en honor de un antiguo compañero galardonado con un importante premio de astrofísica, Jason se dirige a casa… y nunca llega. Un hombre oculto tras una máscara de «geisha» lo conduce a punta de pistola a una central eléctrica abandonada, donde le inyecta algo. Cuando recobra la conciencia, unos desconocidos con trajes especiales lo reciben con las palabras «bienvenido de nuevo». Pero esta realidad no es la que conoce: su mujer no es la misma, su hijo no ha nacido y él ni siquiera es profesor. ¿Es este mundo un sueño? ¿O acaso lo era su vida anterior?",
+      "subjects": [
+        "Novela",
+        "Ciencia ficción"
+      ],
+      "isbn": "",
+      "year": 2015,
+      "fileName": "Materia_oscura_Blake_Crouch.epub",
+      "fileSize": 472170,
+      "words": 88452,
+      "characters": 499774,
+      "pages": 354,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-21T23:06:45.509Z",
+      "updatedAt": "2026-09-21T23:06:47.755Z",
+      "coverPath": "data/covers/945af565-dceb-413a-bbf5-62bf007db68a.jpg"
     },
     {
       "id": "ae0bd514-6d36-4c18-8a5e-8c3e907357da",
