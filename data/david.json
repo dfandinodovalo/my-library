@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-21T23:06:57.744Z",
+  "updatedAt": "2026-09-24T21:57:44.601Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -119,14 +119,14 @@
       "characters": 1047957,
       "pages": 731,
       "pagesSource": "estimado",
-      "status": "reading",
-      "rating": 0,
-      "review": "[12-09-26]\nLlevo 4 capítulos, se me hacen largos pero la trama está interesante. Voy leyendo un capitulo al día, a ver si consigo coger más ritmo.",
+      "status": "read",
+      "rating": 3.5,
+      "review": "[12-09-26]\nLlevo 4 capítulos, se me hacen largos pero la trama está interesante. Voy leyendo un capitulo\n al día, a ver si consigo coger más ritmo.\n\n[24-08-26]\nLibro acabado, se me hizo algo bola (sobretodo por las duraciones de los capítulos) pero me acabó gustando y enganchando, sobretodo el final. No me gustó las mil vueltas que da el caso, ademas, da la sensación de que es imposible resolver el caso desde el punto de vista del lector.",
       "startedAt": "2026-09-09",
-      "finishedAt": "",
+      "finishedAt": "2026-09-24",
       "favorite": false,
       "addedAt": "2026-09-07T12:15:57.595Z",
-      "updatedAt": "2026-09-12T11:22:48.193Z",
+      "updatedAt": "2026-09-24T21:54:53.893Z",
       "coverPath": "data/covers/59274255-3eae-4c13-94ad-5ec209d72412.jpg"
     },
     {
