@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-24T21:57:44.601Z",
+  "updatedAt": "2026-09-26T16:47:11.807Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -210,14 +210,14 @@
       "characters": 499774,
       "pages": 354,
       "pagesSource": "estimado",
-      "status": "pending",
+      "status": "reading",
       "rating": 0,
       "review": "",
-      "startedAt": "",
+      "startedAt": "2026-09-25",
       "finishedAt": "",
       "favorite": false,
       "addedAt": "2026-09-21T23:06:45.509Z",
-      "updatedAt": "2026-09-21T23:06:47.755Z",
+      "updatedAt": "2026-09-26T16:47:06.244Z",
       "coverPath": "data/covers/945af565-dceb-413a-bbf5-62bf007db68a.jpg"
     },
     {
