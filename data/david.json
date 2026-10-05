@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-09-26T16:47:11.807Z",
+  "updatedAt": "2026-10-05T11:51:59.957Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -24,13 +24,13 @@
       "fileName": "Misery_Stephen_King.epub",
       "fileSize": 994956,
       "status": "read",
-      "rating": 3,
+      "rating": 2.5,
       "review": "",
       "startedAt": "2026-08-27",
       "finishedAt": "2026-09-07",
       "favorite": false,
       "addedAt": "2026-08-31T11:32:33.652Z",
-      "updatedAt": "2026-09-07T11:58:46.033Z",
+      "updatedAt": "2026-09-29T12:21:02.447Z",
       "coverPath": "data/covers/064f662e-7e97-4f3b-8020-8aba0c2f4b5e.jpg"
     },
     {
@@ -65,6 +65,75 @@
       "addedAt": "2026-09-21T23:05:23.111Z",
       "updatedAt": "2026-09-21T23:05:27.707Z",
       "coverPath": "data/covers/156feee1-70dc-479d-9172-ac92452565eb.jpg"
+    },
+    {
+      "id": "2354ded3-8916-44b6-88ef-c8350b24d378",
+      "title": "Recursión",
+      "authors": [
+        "Blake Crouch"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es-ES",
+      "description": "UN VERTIGINOSO THRILLER SOBRE EL TIEMPO, LA IDENTIDAD Y LA MEMORIA.Parecía ser una enfermedad. Una epidemia que se esparce sin que sepamos cómo y que vuelve locas a sus víctimas con recuerdos de una vida ajena. Pero la fuerza que está avasallando al mundo no es un patógeno. Es apenas una primera ola provocada por un sorprendente descubrimiento. Y lo que está en juego no es nuestra salud mental, sino el tejido mismo del tiempo.En Nueva York, el detective Barry Sutton está a punto de descubrir la verdad. Y en un laboratorio remoto, la neurocientífica Helena Smith no se ha percatado de que ella tiene la clave del misterio, y las herramientas para revertir la catástrofe.Juntos, Barry y Helena deben confrontar a su enemigo… antes de que ellos mismos, y el mundo entero, queden atrapados en un caótico bucle sin control.",
+      "subjects": [
+        "Novela",
+        "Ciencia ficción",
+        "Intriga"
+      ],
+      "isbn": "",
+      "year": 2019,
+      "fileName": "Recursion_Blake_Crouch.epub",
+      "fileSize": 2467846,
+      "words": 94699,
+      "characters": 536647,
+      "pages": 379,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-30T21:43:01.640Z",
+      "updatedAt": "2026-09-30T21:43:03.136Z",
+      "coverPath": "data/covers/2354ded3-8916-44b6-88ef-c8350b24d378.jpg"
+    },
+    {
+      "id": "33967f38-456b-490e-9b2a-27fa24722959",
+      "title": "Harry Potter y la piedra filosofal",
+      "authors": [
+        "J. K. Rowling"
+      ],
+      "series": "Harry Potter",
+      "seriesIndex": 1,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Harry Potter se ha quedado huérfano y vive en casa de sus abominables tíos y del insoportable primo Dudley. Harry se siente muy triste y solo, hasta que un buen día recibe una carta que cambiará su vida para siempre. En ella le comunican que ha sido aceptado como alumno en el colegio interno Hogwarts de magia y hechicería. A partir de ese momento, la suerte de Harry da un vuelco espectacular. En esa escuela tan especial aprenderá encantamientos, trucos fabulosos y tácticas de defensa contra las malas artes. Se convertirá en el campeón escolar de quidditch, especie de fútbol aéreo que se juega montado sobre escobas, y se hará un puñado de buenos amigos… aunque también algunos temibles enemigos. Pero sobre todo, conocerá los secretos que le permitirán cumplir con su destino. Pues, aunque no lo parezca a primera vista, Harry no es un chico común y corriente. ¡Es un mago!",
+      "subjects": [
+        "Novela",
+        "Fantástico",
+        "Infantil",
+        "Juvenil"
+      ],
+      "isbn": "",
+      "year": 1997,
+      "fileName": "Harry_Potter_y_la_piedra_filosofal_J_K_Rowling.epub",
+      "fileSize": 4425705,
+      "words": 78782,
+      "characters": 456666,
+      "pages": 315,
+      "pagesSource": "estimado",
+      "status": "reading",
+      "rating": 0,
+      "review": "",
+      "startedAt": "2026-09-29",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-29T19:25:37.696Z",
+      "updatedAt": "2026-09-29T19:26:57.446Z",
+      "coverPath": "data/covers/33967f38-456b-490e-9b2a-27fa24722959.jpg"
     },
     {
       "id": "5662e19f-4c00-48d6-a91a-e818c4217751",
@@ -210,14 +279,14 @@
       "characters": 499774,
       "pages": 354,
       "pagesSource": "estimado",
-      "status": "reading",
-      "rating": 0,
+      "status": "read",
+      "rating": 4.5,
       "review": "",
       "startedAt": "2026-09-25",
-      "finishedAt": "",
-      "favorite": false,
+      "finishedAt": "2026-09-29",
+      "favorite": true,
       "addedAt": "2026-09-21T23:06:45.509Z",
-      "updatedAt": "2026-09-26T16:47:06.244Z",
+      "updatedAt": "2026-09-29T12:21:09.735Z",
       "coverPath": "data/covers/945af565-dceb-413a-bbf5-62bf007db68a.jpg"
     },
     {
@@ -248,6 +317,39 @@
       "addedAt": "2026-08-31T11:24:57.958Z",
       "updatedAt": "2026-08-31T11:25:11.605Z",
       "coverPath": "data/covers/ae0bd514-6d36-4c18-8a5e-8c3e907357da.jpg"
+    },
+    {
+      "id": "d58e168c-9851-4c98-a5c6-8805e9c0917d",
+      "title": "Relato de un náufrago",
+      "authors": [
+        "Gabriel García Márquez"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Gabriel García Márquez se descubrió a sí mismo como un narrador. Sin embargo, la intención primera era la de escribir un reportaje sobre un hombre, Luis Alejandro Velasco, que estuvo diez días a la deriva en una balsa mecida por el mar Caribe. El futuro Premio Nobel de Literatura y entonces joven reportero que era García Márquez escuchó el relato de los hechos de boca de su protagonista, y lo transformó, tal vez sin pretenderlo, en un prodigioso ejercicio literario, una narración escueta y vigorosa donde late el pulso de un gran escritor. La publicación por entregas del reportaje en El Espectador de Bogotá supuso un alboroto político considerable —se revelaba la existencia de contrabando ilegal en un buque de la Armada colombiana, lo que costó la vida de siete marineros y el naufragio, más afortunado, de Velasco— y el exilio para su autor, que se vio abocado a una nueva vida.",
+      "subjects": [
+        "Crónica",
+        "Otros"
+      ],
+      "isbn": "",
+      "year": 1969,
+      "fileName": "Relato_de_un_naufrago_Gabriel_Garcia_Marquez.epub",
+      "fileSize": 484439,
+      "words": 30657,
+      "characters": 173728,
+      "pages": 123,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-30T07:19:40.800Z",
+      "updatedAt": "2026-09-30T07:19:44.909Z",
+      "coverPath": "data/covers/d58e168c-9851-4c98-a5c6-8805e9c0917d.jpg"
     },
     {
       "id": "de080f0d-b81e-45c5-b967-7cd1b27484e2",
@@ -330,13 +432,13 @@
       "fileName": "Loba_Negra_Juan_GomezJurado.epub",
       "fileSize": 892181,
       "status": "read",
-      "rating": 3.5,
+      "rating": 3,
       "review": "",
       "startedAt": "",
       "finishedAt": "2026-08-25",
       "favorite": false,
       "addedAt": "2026-08-31T15:09:00.218Z",
-      "updatedAt": "2026-08-31T15:13:23.218Z",
+      "updatedAt": "2026-09-29T12:20:54.591Z",
       "coverPath": "data/covers/e79b82dc-d4c5-4e07-8c45-1f6396aafc21.jpg"
     }
   ]
