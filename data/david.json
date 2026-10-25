@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-10-25T00:01:53.180Z",
+  "updatedAt": "2026-10-25T19:10:42.952Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -134,6 +134,39 @@
       "addedAt": "2026-09-29T19:25:37.696Z",
       "updatedAt": "2026-10-05T21:54:06.494Z",
       "coverPath": "data/covers/33967f38-456b-490e-9b2a-27fa24722959.jpg"
+    },
+    {
+      "id": "3d2d0cd7-e1eb-4cc8-a6c8-127f7ce4a5b4",
+      "title": "Actualización",
+      "authors": [
+        "Blake Crouch"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es-ES",
+      "description": "Logan Ramsay es el siguiente paso en la evolución humana.Al principio no tiene claro qué ha cambiado. Solo nota detalles puntuales: se concentra mejor, es capaz de hacer más cosas a la vez, lee muy rápido, su memoria ha aumentado y no necesita las mismas horas de sueño. Poco a poco, es innegable: a su cerebro le está pasando algo. Y a su cuerpo. Ha empezado a ver el mundo y a quienes lo rodean de un modo completamente nuevo.La verdad es que el genoma de Logan ha sufrido un hackeo. Y hay una razón por la que ha experimentado esta actualización, una razón que se remonta a un horrible legado familiar. Lo que le está sucediendo es solo el inicio de un proyecto mucho más grande, y para hacerle frente Logan tendrá que usar sus nuevas habilidades y transformarse en algo más que él mismo. Quizás incluso en algo más que un ser humano.Pero en el proceso no puede evitar preguntarse: ¿y si en realidad la única esperanza de la humanidad consiste en diseñar nuestra propia evolución?Íntima y épica a la par, Actualización es la nueva novela del galardonado autor de Materia oscura, una historia frenética sobre los límites de la humanidad y sobre nuestro potencial ilimitado. La productora de Steven Spielberg está desarrollando su adaptación cinematográfica.",
+      "subjects": [
+        "Novela",
+        "Ciencia ficción"
+      ],
+      "isbn": "",
+      "year": 2022,
+      "fileName": "Actualizacion_Blake_Crouch.epub",
+      "fileSize": 1744119,
+      "words": 98260,
+      "characters": 570083,
+      "pages": 393,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-10-25T19:10:28.828Z",
+      "updatedAt": "2026-10-25T19:10:30.376Z",
+      "coverPath": "data/covers/3d2d0cd7-e1eb-4cc8-a6c8-127f7ce4a5b4.jpg"
     },
     {
       "id": "5662e19f-4c00-48d6-a91a-e818c4217751",
@@ -448,7 +481,7 @@
     },
     {
       "id": "fe3431dc-0510-4e66-b6fd-cf2aa4748e70",
-      "title": "El Imperio Final. (Ed. revisada)",
+      "title": "El Imperio Final",
       "authors": [
         "Brandon Sanderson"
       ],
@@ -476,7 +509,7 @@
       "finishedAt": "",
       "favorite": false,
       "addedAt": "2026-10-25T00:01:45.839Z",
-      "updatedAt": "2026-10-25T00:01:47.533Z",
+      "updatedAt": "2026-10-25T19:08:28.165Z",
       "coverPath": "data/covers/fe3431dc-0510-4e66-b6fd-cf2aa4748e70.jpg"
     }
   ]
