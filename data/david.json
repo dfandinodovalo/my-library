@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-10-05T11:51:59.957Z",
+  "updatedAt": "2026-10-25T00:01:53.180Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -90,14 +90,14 @@
       "characters": 536647,
       "pages": 379,
       "pagesSource": "estimado",
-      "status": "pending",
-      "rating": 0,
-      "review": "",
-      "startedAt": "",
-      "finishedAt": "",
+      "status": "read",
+      "rating": 3,
+      "review": "Me costó mucho seguir el hilo del libro. No me llegó a enganchar en ningún momento.",
+      "startedAt": "2026-10-15",
+      "finishedAt": "2026-10-24",
       "favorite": false,
       "addedAt": "2026-09-30T21:43:01.640Z",
-      "updatedAt": "2026-09-30T21:43:03.136Z",
+      "updatedAt": "2026-10-24T10:53:23.741Z",
       "coverPath": "data/covers/2354ded3-8916-44b6-88ef-c8350b24d378.jpg"
     },
     {
@@ -125,14 +125,14 @@
       "characters": 456666,
       "pages": 315,
       "pagesSource": "estimado",
-      "status": "reading",
-      "rating": 0,
+      "status": "read",
+      "rating": 3.5,
       "review": "",
       "startedAt": "2026-09-29",
-      "finishedAt": "",
+      "finishedAt": "2026-10-05",
       "favorite": false,
       "addedAt": "2026-09-29T19:25:37.696Z",
-      "updatedAt": "2026-09-29T19:26:57.446Z",
+      "updatedAt": "2026-10-05T21:54:06.494Z",
       "coverPath": "data/covers/33967f38-456b-490e-9b2a-27fa24722959.jpg"
     },
     {
@@ -290,33 +290,38 @@
       "coverPath": "data/covers/945af565-dceb-413a-bbf5-62bf007db68a.jpg"
     },
     {
-      "id": "ae0bd514-6d36-4c18-8a5e-8c3e907357da",
-      "title": "El Imperio Final",
+      "id": "ba14cb3e-762b-454c-a788-eb2eb19c1b95",
+      "title": "El Cuarto Mono",
       "authors": [
-        "Brandon Sanderson"
+        "J. D. Barker"
       ],
-      "series": "Nacidos de la bruma",
+      "series": "Detective Porter",
       "seriesIndex": 1,
       "publisher": "Epublibre",
       "language": "es",
-      "description": "Durante mil años, han caído las cenizas y nada florece. Durante mil años, los skaa han sido esclavizados y viven sumidos en un miedo inevitable. Durante mil años, el Lord Legislador reina con un poder absoluto gracias al terror y a su divina invencibilidad. Le ayudan los «obligadores» y los «inquisidores», junto a la poderosa magia de la «alomancia», que reside en los nobles.Algunos, sólo algunos, son capaces de «quemar» los metales que han tragado y que les otorgan poderes sobrenaturales. Diferentes metales, actuando en pares, otorgan poderes distintos. Pero los nobles, demasiado a menudo, han tenido trato sexual con jóvenes skaa y, aunque la ley lo prohíbe, algunos de sus bastardos han sobrevivido. Y algunos han heredado los poderes alománticos. Los «brumosos» (mistings) tienen sólo uno de esos poderes, pero los «nacidos de la bruma» (mistborns) son capaces de dominarlos todos.Ahora, Kelsier, el «superviviente», el único que ha logrado huir de los Pozos de Hathsin, ha encontrado a Vin, una pobre chica skaa con mucha suerte… Tal vez los dos unidos a la rebelión que los skaa intentan desde hace mil años puedan cambiar el mundo y la atroz dominación del Lord Legislador.",
+      "description": "El detective de la policía de Chicago Sam Porter investiga el caso de un hombre atropellado, pues los indicios en la escena del crimen apuntan a que se trata de El Cuarto Mono, un asesino en serie que ha estado aterrorizando la ciudad. Su «modus operandi» consistía en enviar tres cajas blancas a los padres de las víctimas que secuestra y mata: una primera con una oreja, una segunda con los dos ojos, y otra con la lengua; y finalmente dejar abandonado el cuerpo sin vida en algún lugar. El hombre atropellado llevaba una de esas cajas blancas. Se inicia así una frenética carrera contrarreloj para averiguar dónde se encuentra encerrada la próxima víctima.",
       "subjects": [
         "Novela",
-        "Fantástico"
+        "Intriga",
+        "Policial"
       ],
       "isbn": "",
-      "year": 2005,
-      "fileName": "El_Imperio_Final_Brandon_Sanderson.epub",
-      "fileSize": 2369574,
+      "year": 2017,
+      "fileName": "El_Cuarto_Mono_J_D_Barker.epub",
+      "fileSize": 772940,
+      "words": 128503,
+      "characters": 715437,
+      "pages": 514,
+      "pagesSource": "estimado",
       "status": "pending",
       "rating": 0,
       "review": "",
       "startedAt": "",
-      "finishedAt": "2026-08-31",
+      "finishedAt": "",
       "favorite": false,
-      "addedAt": "2026-08-31T11:24:57.958Z",
-      "updatedAt": "2026-08-31T11:25:11.605Z",
-      "coverPath": "data/covers/ae0bd514-6d36-4c18-8a5e-8c3e907357da.jpg"
+      "addedAt": "2026-10-24T23:59:25.540Z",
+      "updatedAt": "2026-10-24T23:59:32.612Z",
+      "coverPath": "data/covers/ba14cb3e-762b-454c-a788-eb2eb19c1b95.jpg"
     },
     {
       "id": "d58e168c-9851-4c98-a5c6-8805e9c0917d",
@@ -341,14 +346,14 @@
       "characters": 173728,
       "pages": 123,
       "pagesSource": "estimado",
-      "status": "pending",
-      "rating": 0,
+      "status": "read",
+      "rating": 3,
       "review": "",
-      "startedAt": "",
-      "finishedAt": "",
+      "startedAt": "2026-10-06",
+      "finishedAt": "2026-10-09",
       "favorite": false,
       "addedAt": "2026-09-30T07:19:40.800Z",
-      "updatedAt": "2026-09-30T07:19:44.909Z",
+      "updatedAt": "2026-10-09T11:03:19.134Z",
       "coverPath": "data/covers/d58e168c-9851-4c98-a5c6-8805e9c0917d.jpg"
     },
     {
@@ -440,6 +445,39 @@
       "addedAt": "2026-08-31T15:09:00.218Z",
       "updatedAt": "2026-09-29T12:20:54.591Z",
       "coverPath": "data/covers/e79b82dc-d4c5-4e07-8c45-1f6396aafc21.jpg"
+    },
+    {
+      "id": "fe3431dc-0510-4e66-b6fd-cf2aa4748e70",
+      "title": "El Imperio Final. (Ed. revisada)",
+      "authors": [
+        "Brandon Sanderson"
+      ],
+      "series": "Nacidos de la bruma",
+      "seriesIndex": 1,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Durante mil años, han caído las cenizas y nada florece. Durante mil años, los skaa han sido esclavizados y viven sumidos en un miedo inevitable. Durante mil años, el Lord Legislador reina con un poder absoluto gracias al terror, a sus poderes y a su inmortalidad. Le ayudan «obligadores» e «inquisidores», junto a la poderosa magia de la alomancia. Pero los nobles a menudo han tenido trato sexual con jóvenes skaa y, aunque la ley lo prohíbe, algunos de sus bastardos han sobrevivido y heredado los poderes alománticos: son los «nacidos de la bruma» (mistborns). Ahora, Kelsier, el «superviviente», el único que ha logrado huir de los Pozos de Hathsin, ha encontrado a Vin, una pobre chica skaa con mucha suerte… Tal vez los dos, unidos a la rebelión que los skaa intentan desde hace mil años, logren cambiar el mundo y la atroz dominación del Lord Legislador.",
+      "subjects": [
+        "Novela",
+        "Fantástico"
+      ],
+      "isbn": "",
+      "year": 2005,
+      "fileName": "El_Imperio_Final_Ed_revisada_Brandon_Sanderson.epub",
+      "fileSize": 2366645,
+      "words": 213091,
+      "characters": 1255063,
+      "pages": 852,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-10-25T00:01:45.839Z",
+      "updatedAt": "2026-10-25T00:01:47.533Z",
+      "coverPath": "data/covers/fe3431dc-0510-4e66-b6fd-cf2aa4748e70.jpg"
     }
   ]
 }
