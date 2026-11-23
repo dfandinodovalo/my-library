@@ -2,7 +2,7 @@
   "format": "my-library",
   "version": 1,
   "profile": "David",
-  "updatedAt": "2026-10-25T19:10:42.952Z",
+  "updatedAt": "2026-11-23T15:38:47.173Z",
   "books": [
     {
       "id": "064f662e-7e97-4f3b-8020-8aba0c2f4b5e",
@@ -56,15 +56,50 @@
       "characters": 899033,
       "pages": 618,
       "pagesSource": "estimado",
+      "status": "reading",
+      "rating": 0,
+      "review": "",
+      "startedAt": "2026-11-03",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-09-21T23:05:23.111Z",
+      "updatedAt": "2026-11-03T21:55:23.142Z",
+      "coverPath": "data/covers/156feee1-70dc-479d-9172-ac92452565eb.jpg"
+    },
+    {
+      "id": "1dbbe7e1-6b65-4c71-95af-4febba86ce34",
+      "title": "La carretera",
+      "authors": [
+        "Cormac McCarthy"
+      ],
+      "series": "100 mejores del s. XXI para el NYT",
+      "seriesIndex": 13,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "La carretera, novela galardonada con el premio Pulitzer 2007 y best seller literario del año en Estados Unidos, transcurre en la inmensidad del territorio norteamericano, un paisaje literalmente quemado por lo que parece haber sido un reciente holocausto nuclear. Un padre trata de salvar a su hijo emprendiendo un viaje con él. Rodeados de un paisaje baldío, amenazados por bandas de caníbales, empujando un carrito de la compra donde guardan sus escasas pertenencias, recorren los lugares donde el padre pasó una infancia recordada a veces en forma de breves bocetos del paraíso perdido, y avanzan hacia el sur, hacia el mar, huyendo de un frío «capaz de romper las rocas».",
+      "subjects": [
+        "Ciencia ficción",
+        "Distopía",
+        "Terror",
+        "Novela"
+      ],
+      "isbn": "",
+      "year": 2005,
+      "fileName": "La_carretera_Cormac_McCarthy.epub",
+      "fileSize": 421598,
+      "words": 57279,
+      "characters": 315916,
+      "pages": 229,
+      "pagesSource": "estimado",
       "status": "pending",
       "rating": 0,
       "review": "",
       "startedAt": "",
       "finishedAt": "",
       "favorite": false,
-      "addedAt": "2026-09-21T23:05:23.111Z",
-      "updatedAt": "2026-09-21T23:05:27.707Z",
-      "coverPath": "data/covers/156feee1-70dc-479d-9172-ac92452565eb.jpg"
+      "addedAt": "2026-11-03T21:48:05.638Z",
+      "updatedAt": "2026-11-03T21:48:06.719Z",
+      "coverPath": "data/covers/1dbbe7e1-6b65-4c71-95af-4febba86ce34.jpg"
     },
     {
       "id": "2354ded3-8916-44b6-88ef-c8350b24d378",
@@ -99,6 +134,40 @@
       "addedAt": "2026-09-30T21:43:01.640Z",
       "updatedAt": "2026-10-24T10:53:23.741Z",
       "coverPath": "data/covers/2354ded3-8916-44b6-88ef-c8350b24d378.jpg"
+    },
+    {
+      "id": "27fa54e8-63fd-4223-b69b-83459b4b5f93",
+      "title": "La riada",
+      "authors": [
+        "Michael McDowell"
+      ],
+      "series": "Blackwater",
+      "seriesIndex": 1,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Las gélidas y oscuras aguas del río Blackwater inundan Perdido, un pequeño pueblo al sur de Alabama. Allí, los Caskey, un gran clan de ricos terratenientes, intentan hacer frente a los daños causados por la riada. Liderados por Mary-Love, la incontestable matriarca, y Óscar, su obediente hijo, los Caskey trabajan por recomponerse y salvaguardar su fortuna. Pero no cuentan con la aparición de la misteriosa Elinor Dammert. Una joven hermosa pero parca en palabras con un único objetivo: acercarse a los Caskey cueste lo que cueste.",
+      "subjects": [
+        "Novela",
+        "Drama",
+        "Fantástico"
+      ],
+      "isbn": "",
+      "year": 1983,
+      "fileName": "La_riada_Michael_McDowell.epub",
+      "fileSize": 945897,
+      "words": 51782,
+      "characters": 293809,
+      "pages": 207,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-11-05T22:03:38.432Z",
+      "updatedAt": "2026-11-05T22:03:40.633Z",
+      "coverPath": "data/covers/27fa54e8-63fd-4223-b69b-83459b4b5f93.jpg"
     },
     {
       "id": "33967f38-456b-490e-9b2a-27fa24722959",
@@ -195,7 +264,7 @@
       "finishedAt": "2026-09-08",
       "favorite": false,
       "addedAt": "2026-09-02T09:36:12.481Z",
-      "updatedAt": "2026-09-08T21:31:38.048Z",
+      "updatedAt": "2026-11-02T22:57:18.799Z",
       "coverPath": "data/covers/5662e19f-4c00-48d6-a91a-e818c4217751.jpg"
     },
     {
@@ -261,6 +330,39 @@
       "coverPath": "data/covers/5b219557-f6be-4d9c-b3a0-01d52022e1f3.jpg"
     },
     {
+      "id": "69d331fa-8fdf-4f30-b58c-10e1815f0ed7",
+      "title": "1984",
+      "authors": [
+        "George Orwell"
+      ],
+      "series": "Áncora & Delfín",
+      "seriesIndex": 66,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "En una supuesta sociedad policial, el Estado ha conseguido el control total sobre el individuo. No existe siquiera un resquicio para la intimidad personal: el sexo es un crimen, las emociones están prohibidas, la adoración al sistema es la condición para seguir vivo. La Policía del Pensamiento se encargará de torturar hasta la muerte a los conspiradores, aunque para ello sea necesario acusar a inocentes. Winston y Julia, a pesar de ser miembros del Partido y sabiendo que el Gran Hermano les vigila, se rebelan contra ese poder que se ha adueñado de las conciencias de sus conciudadanos. El camino que seguirán se convertirá en un peligroso laberinto hacia un final incierto.",
+      "subjects": [
+        "Novela",
+        "Ciencia ficción"
+      ],
+      "isbn": "",
+      "year": 1948,
+      "fileName": "1984_George_Orwell.epub",
+      "fileSize": 557885,
+      "words": 101044,
+      "characters": 597975,
+      "pages": 404,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-11-03T21:46:27.633Z",
+      "updatedAt": "2026-11-03T21:46:32.600Z",
+      "coverPath": "data/covers/69d331fa-8fdf-4f30-b58c-10e1815f0ed7.jpg"
+    },
+    {
       "id": "7a8416e4-cb8a-4d68-be9e-591dc5fffdb5",
       "title": "Hábitos atómicos",
       "authors": [
@@ -288,6 +390,40 @@
       "addedAt": "2026-08-31T15:09:47.325Z",
       "updatedAt": "2026-08-31T15:12:17.913Z",
       "coverPath": "data/covers/7a8416e4-cb8a-4d68-be9e-591dc5fffdb5.jpg"
+    },
+    {
+      "id": "84f97624-c08f-47e0-a034-f28967fe61c3",
+      "title": "Sin noticias de Gurb",
+      "authors": [
+        "Eduardo Mendoza"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Perdido en la Barcelona preolímpica, el extraterrestre Gurb pone al servicio de su supervivencia la extraña cualidad de adoptar el aspecto que le plazca. Se pierde con la apariencia de Marta Sánchez, mientras su compañero alienígena inicia la búsqueda en la jungla urbana. Por su diario personal vamos conociendo las increíbles peripecias de un extraterrestre en Barcelona. En este relato de carácter paródico y satírico, la invención de Eduardo Mendoza convierte la Barcelona cotidiana y absurda en el escenario de una carnavalada. Tras las máscaras pintarrajedas y grotescas, se revela el verdadero rostro del hombre urbano actual y, tras el estilo literario, la acerada conciencia artística del escritor. Eduardo Mendoza afirma de esta obra que «“Sin noticias de Gurb” es, sin duda, el libro más excéntrico de cuantos he escrito. No hay en él una sola sombra de melancolía. Es una mirada sobre el mundo asombrada, un punto desamparada, pero sin asomo de tragedia ni de censura».",
+      "subjects": [
+        "Humor",
+        "Novela",
+        "Sátira"
+      ],
+      "isbn": "",
+      "year": 1990,
+      "fileName": "Sin_noticias_de_Gurb_Eduardo_Mendoza.epub",
+      "fileSize": 300881,
+      "words": 30421,
+      "characters": 173652,
+      "pages": 122,
+      "pagesSource": "estimado",
+      "status": "reading",
+      "rating": 0,
+      "review": "",
+      "startedAt": "2026-11-18",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-11-23T15:38:20.942Z",
+      "updatedAt": "2026-11-23T15:38:27.879Z",
+      "coverPath": "data/covers/84f97624-c08f-47e0-a034-f28967fe61c3.jpg"
     },
     {
       "id": "945af565-dceb-413a-bbf5-62bf007db68a",
@@ -323,6 +459,39 @@
       "coverPath": "data/covers/945af565-dceb-413a-bbf5-62bf007db68a.jpg"
     },
     {
+      "id": "950085e0-18b9-4a6a-aec9-73df1428d7a2",
+      "title": "El fin de la eternidad",
+      "authors": [
+        "Isaac Asimov"
+      ],
+      "series": "Super Ficción",
+      "seriesIndex": 26,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Andrew Harlan ha cometido un crimen, pero su acto no es un simple delito. La ley que ha quebrantado es la más importante de todas para un Ejecutor: la ley que impide que miles de años de historia sean borrados y reescritos de forma irreversible por la guerra, la muerte y la decadencia. Ni siquiera la Eternidad, la organización a la que pertenece, puede detenerle.",
+      "subjects": [
+        "Novela",
+        "Ciencia ficción"
+      ],
+      "isbn": "",
+      "year": 1954,
+      "fileName": "El_fin_de_la_eternidad_Isaac_Asimov.epub",
+      "fileSize": 655307,
+      "words": 70978,
+      "characters": 431571,
+      "pages": 284,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-11-23T15:37:48.572Z",
+      "updatedAt": "2026-11-23T15:37:49.961Z",
+      "coverPath": "data/covers/950085e0-18b9-4a6a-aec9-73df1428d7a2.jpg"
+    },
+    {
       "id": "ba14cb3e-762b-454c-a788-eb2eb19c1b95",
       "title": "El Cuarto Mono",
       "authors": [
@@ -355,6 +524,40 @@
       "addedAt": "2026-10-24T23:59:25.540Z",
       "updatedAt": "2026-10-24T23:59:32.612Z",
       "coverPath": "data/covers/ba14cb3e-762b-454c-a788-eb2eb19c1b95.jpg"
+    },
+    {
+      "id": "ba2dabe6-911b-46dd-874c-d940f7adc887",
+      "title": "Cadáver exquisito",
+      "authors": [
+        "Agustina María Bazterrica"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "La súbita aparición de un virus letal que ataca a los animales modifica de manera irreversible el mundo: desde las fieras hasta las mascotas deben ser sistemáticamente sacrificadas, y su carne ya no puede ser consumida. Los gobiernos enfrentan la situación con una decisión drástica: legalizando la cría, reproducción, matanza y procesamiento de carne humana. El canibalismo es ley y la sociedad ha quedado dividida en dos grupos: los que comen y los que son comidos.Marcos Tejo, encargado general del frigorífico Krieg, separado de su esposa y a cargo de su padre, es un oscuro burócrata. El día en que recibe como regalo una mujer criada para el consumo, las tentaciones lo transforman en una conciencia peligrosa de pliegues truculentos que lo llevará a transgredir las nuevas normas hasta límites que la sociedad desconoce.¿Qué resto de humanidad cabe cuando los muertos son cremados para evitar su consumo? ¿Quién es el otro si, de verdad, somos lo que comemos? En esta despiadada distopía —tan brutal como sutil, tan alegórica como realista—, Agustina Bazterrica inspira, con el poder explosivo de la ficción, sensaciones y debates de suma actualidad.",
+      "subjects": [
+        "Ciencia ficción",
+        "Drama",
+        "Novela"
+      ],
+      "isbn": "",
+      "year": 2017,
+      "fileName": "Cadaver_exquisito_Agustina_Maria_Bazterrica.epub",
+      "fileSize": 205118,
+      "words": 47702,
+      "characters": 264342,
+      "pages": 191,
+      "pagesSource": "estimado",
+      "status": "read",
+      "rating": 3.5,
+      "review": "",
+      "startedAt": "2026-10-27",
+      "finishedAt": "2026-11-02",
+      "favorite": false,
+      "addedAt": "2026-10-26T11:49:17.955Z",
+      "updatedAt": "2026-11-02T22:56:52.943Z",
+      "coverPath": "data/covers/ba2dabe6-911b-46dd-874c-d940f7adc887.jpg"
     },
     {
       "id": "d58e168c-9851-4c98-a5c6-8805e9c0917d",
@@ -448,6 +651,40 @@
       "addedAt": "2026-08-31T15:08:27.984Z",
       "updatedAt": "2026-08-31T15:14:18.549Z",
       "coverPath": "data/covers/e72928bd-00e7-4040-8592-0e51ae39419d.jpg"
+    },
+    {
+      "id": "e75ada45-9800-4e14-bd6b-cdab2f8eb177",
+      "title": "Enfócate",
+      "authors": [
+        "Cal Newport"
+      ],
+      "series": "",
+      "seriesIndex": null,
+      "publisher": "Epublibre",
+      "language": "es",
+      "description": "Las distracciones no son malas en sí mismas. Lo negativo es que por ellas no logremos concentrarnos en una sola tarea a la vez y, por lo tanto, no culminemos ninguna con éxito o dentro del tiempo que tenemos previsto para ella. Este es un problema cada vez más frecuente en la actualidad que lleva, en muchas ocasiones, a sentimientos de frustración, ansiedad, cansancio y a altos niveles de improductividad en las organizaciones. Enfocarse en una sola actividad se ha convertido en una capacidad extraña en el mundo de hoy y, por lo tanto, según Cal Newport, en un activo cada vez más valioso en un entorno competitivo y lleno de trampas que roban nuestra atención. Trabajar a fondo permite dominar información en menos tiempo, resolver problemas de manera efectiva y obtener resultados sobresalientes, lo cual redunda en satisfacciones personales y un impacto laboral positivo. A partir de cuatro reglas prácticas, este libro demuestra el valor de desarrollar y aumentar los niveles de concentración en un mundo que incentiva la hiperconexión y la «multitarea».",
+      "subjects": [
+        "Referencia",
+        "Autoayuda",
+        "Divulgación"
+      ],
+      "isbn": "",
+      "year": 2016,
+      "fileName": "Enfocate_Cal_Newport.epub",
+      "fileSize": 451479,
+      "words": 82405,
+      "characters": 508081,
+      "pages": 330,
+      "pagesSource": "estimado",
+      "status": "pending",
+      "rating": 0,
+      "review": "",
+      "startedAt": "",
+      "finishedAt": "",
+      "favorite": false,
+      "addedAt": "2026-10-26T13:40:43.963Z",
+      "updatedAt": "2026-10-26T13:40:45.344Z",
+      "coverPath": "data/covers/e75ada45-9800-4e14-bd6b-cdab2f8eb177.jpg"
     },
     {
       "id": "e79b82dc-d4c5-4e07-8c45-1f6396aafc21",
